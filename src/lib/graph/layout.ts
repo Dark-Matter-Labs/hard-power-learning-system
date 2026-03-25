@@ -2,6 +2,10 @@ import type { SimulationNodeDatum, SimulationLinkDatum } from 'd3';
 import type { Node } from '@/lib/types/nodes';
 import type { Edge } from '@/lib/types/edges';
 
+export const CARD_WIDTH = 200;
+export const CARD_HEIGHT = 80;
+export const CARD_COLLIDE_RADIUS = 120;
+
 export interface GraphNode extends SimulationNodeDatum {
   readonly id: string;
   readonly node_type: string;
@@ -63,8 +67,8 @@ export function toGraphLink(edge: Edge): GraphLink {
 }
 
 export const FORCE_CONFIG = {
-  charge: -200,
-  linkDistance: 100,
-  collideRadius: 30,
+  charge: -400,
+  linkDistance: 180,
+  collideRadius: CARD_COLLIDE_RADIUS,
   centerStrength: 0.05,
 } as const;
