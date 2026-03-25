@@ -16,7 +16,7 @@ export function NodeDetailPanel({ node, edges, allNodes, onClose }: NodeDetailPa
   const extraction = node.llm_extraction;
 
   return (
-    <div className="absolute right-0 top-0 bottom-0 w-72 bg-gray-950 border-l border-gray-800 p-4 overflow-y-auto">
+    <div className="absolute right-0 top-[49px] bottom-0 w-72 bg-gray-950 border-l border-gray-800 p-4 overflow-y-auto">
       <div className="flex items-center justify-between mb-3">
         <NodeTypeBadge nodeType={node.node_type} />
         <button onClick={onClose} className="text-gray-600 hover:text-gray-400 text-lg">×</button>
