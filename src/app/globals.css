@@ -8,11 +8,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-
   /* Node-type colours */
   --color-node-hunch: #7F77DD;
+  /* assumption node has two colours: bg = promoted/background state, fg = active/foreground state */
   --color-node-assumption-bg: #1D9E75;
   --color-node-assumption-fg: #D85A30;
   --color-node-test: #D4537E;
