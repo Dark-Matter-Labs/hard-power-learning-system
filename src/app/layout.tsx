@@ -43,7 +43,7 @@ export default async function RootLayout({
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased bg-gray-950 text-gray-100`}>
         <AuthProvider initialUser={user}>
           {user && <NavBar reviewCount={reviewCount} />}
-          <main className="h-screen overflow-hidden">
+          <main className="h-screen overflow-y-auto">
             {children}
           </main>
         </AuthProvider>

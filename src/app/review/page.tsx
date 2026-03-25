@@ -47,7 +47,7 @@ export default async function ReviewPage() {
   }
 
   return (
-    <div className="page-with-nav max-w-3xl mx-auto px-4 py-8">
+    <div className="page-with-nav"><div className="max-w-3xl mx-auto px-4 py-8">
       <h1 className="text-lg font-bold text-gray-200 mb-6">Weekly Review</h1>
 
       {/* Stale hunches warning */}
@@ -101,6 +101,6 @@ export default async function ReviewPage() {
           </div>
         </div>
       )}
-    </div>
+    </div></div>
   );
 }
