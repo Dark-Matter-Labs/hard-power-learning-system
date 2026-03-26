@@ -2,12 +2,15 @@
 -- Run against your Supabase project in the SQL editor or via CLI
 
 -- ─────────────────────────────────────────────────────────────
--- New node types
+-- New node types (includes backfill of commitment + entity
+-- which were referenced in the UI but missing from seed.sql)
 -- ─────────────────────────────────────────────────────────────
 INSERT INTO node_types (id, label, description, color, sort_order) VALUES
-  ('intervention', 'Intervention', 'An action that simultaneously consumes commitment resources AND tests assumptions — the bridge between both models', '#534AB7', 11),
-  ('signal',       'Signal',       'Feedback from reality that must update both context understanding and allocation decisions', '#A32D2D', 12),
-  ('goal_space',   'Goal space',   'A resource-addressable outcome field — broader than a single commitment, may contain multiple commitments', '#0F6E56', 13)
+  ('commitment',   'Commitment',   'A resource allocation with delivery pressure and consequence', '#185FA5', 10),
+  ('entity',       'Entity',       'A person, organisation, or institution in the network', '#888780', 11),
+  ('intervention', 'Intervention', 'An action that simultaneously consumes commitment resources AND tests assumptions — the bridge between both models', '#534AB7', 12),
+  ('signal',       'Signal',       'Feedback from reality that must update both context understanding and allocation decisions', '#A32D2D', 13),
+  ('goal_space',   'Goal space',   'A resource-addressable outcome field — broader than a single commitment, may contain multiple commitments', '#0F6E56', 14)
 ON CONFLICT (id) DO UPDATE SET
   label       = EXCLUDED.label,
   description = EXCLUDED.description,
