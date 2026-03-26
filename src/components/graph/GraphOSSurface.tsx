@@ -79,6 +79,7 @@ export function GraphOSSurface() {
   const [activeTypes, setActiveTypes] = useState<string[]>([...ALL_TYPE_IDS]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [capturePos, setCapturePos] = useState<{ x: number; y: number } | null>(null);
+  const [captureDefaultType, setCaptureDefaultType] = useState('hunch');
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [currentView, setCurrentView] = useState<GraphView>('force');
   const [loading, setLoading] = useState(true);
@@ -160,6 +161,7 @@ export function GraphOSSurface() {
       setSelectedNode(null);
       setHighlight({ type: 'none' });
       setSelectedCommitmentId(null);
+      setCaptureDefaultType('hunch');
       setCapturePos({ x: screenX, y: screenY });
     },
     []
@@ -285,7 +287,10 @@ export function GraphOSSurface() {
         onSelectCommitment={handleSelectCommitment}
         onSelectTension={handleSelectTension}
         onAssumptionClick={handleAssumptionClick}
-        onAddCommitment={() => setCapturePos({ x: window.innerWidth / 2, y: window.innerHeight / 2 })}
+        onAddCommitment={() => {
+          setCaptureDefaultType('commitment');
+          setCapturePos({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+        }}
         onAcknowledgeTension={handleAcknowledgeTension}
         onResolveTension={handleResolveTension}
       />
@@ -293,6 +298,7 @@ export function GraphOSSurface() {
       {capturePos !== null && (
         <InlineCaptureCard
           position={capturePos}
+          defaultNodeType={captureDefaultType}
           onClose={() => setCapturePos(null)}
           onCreated={handleNodeCreated}
         />

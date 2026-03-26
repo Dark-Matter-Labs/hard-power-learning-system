@@ -18,13 +18,14 @@ interface InlineCaptureCardProps {
   /** Screen coordinates (viewport) where the card should appear */
   readonly position: { x: number; y: number };
   readonly linkedNodeId?: string;
+  readonly defaultNodeType?: string;
   readonly onClose: () => void;
   readonly onCreated: (nodeId: string) => void;
 }
 
-export function InlineCaptureCard({ position, onClose, onCreated }: InlineCaptureCardProps) {
+export function InlineCaptureCard({ position, defaultNodeType = 'hunch', onClose, onCreated }: InlineCaptureCardProps) {
   const [title, setTitle] = useState('');
-  const [nodeType, setNodeType] = useState('hunch');
+  const [nodeType, setNodeType] = useState(defaultNodeType);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
