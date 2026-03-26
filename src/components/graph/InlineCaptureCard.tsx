@@ -9,19 +9,23 @@ const NODE_TYPES = [
   { value: 'test', label: 'Test' },
   { value: 'learning', label: 'Learning' },
   { value: 'option', label: 'Option' },
+  { value: 'commitment', label: 'Commitment' },
+  { value: 'signal', label: 'Signal' },
+  { value: 'goal_space', label: 'Goal space' },
 ];
 
 interface InlineCaptureCardProps {
   /** Screen coordinates (viewport) where the card should appear */
   readonly position: { x: number; y: number };
   readonly linkedNodeId?: string;
+  readonly defaultNodeType?: string;
   readonly onClose: () => void;
   readonly onCreated: (nodeId: string) => void;
 }
 
-export function InlineCaptureCard({ position, onClose, onCreated }: InlineCaptureCardProps) {
+export function InlineCaptureCard({ position, defaultNodeType = 'hunch', onClose, onCreated }: InlineCaptureCardProps) {
   const [title, setTitle] = useState('');
-  const [nodeType, setNodeType] = useState('hunch');
+  const [nodeType, setNodeType] = useState(defaultNodeType);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
