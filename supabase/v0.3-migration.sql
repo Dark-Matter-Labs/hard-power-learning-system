@@ -62,11 +62,22 @@ CREATE INDEX IF NOT EXISTS idx_tension_alerts_created    ON tension_alerts(creat
 
 ALTER TABLE tension_alerts ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Authenticated users can read tension_alerts" ON tension_alerts;
+DROP POLICY IF EXISTS "Authenticated users can manage tension_alerts" ON tension_alerts;
+
 CREATE POLICY "Authenticated users can read tension_alerts"
   ON tension_alerts FOR SELECT TO authenticated USING (true);
 
 CREATE POLICY "Authenticated users can manage tension_alerts"
   ON tension_alerts FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
--- Enable realtime for live tension alerts
-ALTER PUBLICATION supabase_realtime ADD TABLE tension_alerts;
+-- Enable realtime for live tension alerts (safe to run multiple times)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND tablename = 'tension_alerts'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE tension_alerts;
+  END IF;
+END $$;
