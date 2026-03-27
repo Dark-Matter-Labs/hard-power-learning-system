@@ -36,7 +36,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Commitment panel displays goal_space → trigger_outcome → commitment as a collapsible 3-level tree
   3. DB schema contains trigger_outcome node type and advances_goal / targets_outcome / indicates_progress edge types (verifiable via migration file)
   4. Each goal space section in the commitment panel header shows a trajectory badge placeholder
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — DB migration + trigger_outcome in type selectors
+- [ ] 01-02-PLAN.md — TrajectoryBadge + CommitmentPanel 3-level hierarchy restructure
 
 ### Phase 2: Goal Space Panel
 **Goal**: Selecting a goal_space node opens a dedicated panel that shows all trigger outcomes with computed progress indicators and item counts
@@ -99,7 +102,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Requirements**: SESS-01, SESS-02, SESS-03, SESS-04, SESS-05
 **Success Criteria** (what must be TRUE):
   1. /reflect page exists and is accessible
-  2. /reflect shows convergence sparklines for all goal spaces over a selectable 30–90 day window
+  2. /reflect shows convergence sparklines for all goal spaces over a selectable 30-90 day window
   3. /reflect presents guided reflection questions as text inputs and persists answers
   4. /reflect shows a decisions log where team members can record decisions with linked node effects
   5. reflection_sessions table stores machine_reflection, human_responses, decisions, convergence_snapshot, and participants for each session
@@ -108,11 +111,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Goal Hierarchy | 0/TBD | Not started | - |
+| 1. Goal Hierarchy | 0/2 | Not started | - |
 | 2. Goal Space Panel | 0/TBD | Not started | - |
 | 3. Capture Linking + Extraction | 0/TBD | Not started | - |
 | 4. Convergence Computation | 0/TBD | Not started | - |
