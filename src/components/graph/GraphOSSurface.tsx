@@ -11,6 +11,7 @@ import { GraphTopBar, type GraphView } from './GraphTopBar';
 import { DashboardSidebar } from './DashboardSidebar';
 import { InlineCaptureCard } from './InlineCaptureCard';
 import { NodeDetailPanel } from './NodeDetailPanel';
+import { GoalSpacePanel } from './GoalSpacePanel';
 import { CommitmentPanel } from '@/components/commitment/CommitmentPanel';
 
 const NODE_TYPE_OPTIONS = [
@@ -311,7 +312,15 @@ export function GraphOSSurface() {
         />
       )}
 
-      {selectedNode !== null && (
+      {selectedNode !== null && selectedNode.node_type === 'goal_space' && (
+        <GoalSpacePanel
+          node={selectedNode}
+          edges={edges}
+          allNodes={nodes}
+          onClose={() => setSelectedNode(null)}
+        />
+      )}
+      {selectedNode !== null && selectedNode.node_type !== 'goal_space' && (
         <NodeDetailPanel
           node={selectedNode}
           edges={edges}

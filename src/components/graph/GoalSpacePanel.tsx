@@ -22,7 +22,7 @@ const STATUS_DISPLAY: Record<OutcomeStatus, { symbol: string; colorClass: string
   blocked:     { symbol: '\u2715', colorClass: 'text-red-500' },
 };
 
-export function GoalSpacePanel({ node, edges, allNodes, onClose }: GoalSpacePanelProps): JSX.Element {
+export function GoalSpacePanel({ node, edges, allNodes, onClose }: GoalSpacePanelProps) {
   const nodeMap = new Map(allNodes.map(n => [n.id, n]));
 
   const outcomes: readonly Node[] = edges
