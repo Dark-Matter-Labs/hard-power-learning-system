@@ -225,6 +225,8 @@ export function GraphOSSurface() {
   }, []);
 
   const commitments = nodes.filter(n => n.node_type === 'commitment');
+  const goalSpaces = nodes.filter(n => n.node_type === 'goal_space');
+  const triggerOutcomes = nodes.filter(n => n.node_type === 'trigger_outcome');
 
   const sidebarStats = {
     awaitingReview: nodes.filter(n => n.status === 'llm_reviewed').length,
@@ -280,6 +282,8 @@ export function GraphOSSurface() {
       />
 
       <CommitmentPanel
+        goalSpaces={goalSpaces}
+        triggerOutcomes={triggerOutcomes}
         commitments={commitments}
         allNodes={nodes}
         edges={edges}
