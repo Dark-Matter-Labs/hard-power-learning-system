@@ -96,13 +96,13 @@ function computeTreeLayout(
   treeLayout(hier);
 
   let minX = Infinity, maxX = -Infinity;
-  hier.each(n => { minX = Math.min(minX, n.x); maxX = Math.max(maxX, n.x); });
+  hier.each(n => { minX = Math.min(minX, n.x ?? 0); maxX = Math.max(maxX, n.x ?? 0); });
   const offsetX = width / 2 - (minX + maxX) / 2;
   const offsetY = 60;
 
   hier.each(n => {
     positions.set(n.data.id, {
-      x: n.x + offsetX,
+      x: (n.x ?? 0) + offsetX,
       y: n.depth * (CARD_HEIGHT + 80) + offsetY,
     });
   });
