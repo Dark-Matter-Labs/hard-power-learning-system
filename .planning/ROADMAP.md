@@ -52,7 +52,7 @@ Plans:
   4. Each trigger outcome row shows commitment count and hunch count
 **Plans:** 2 plans
 Plans:
-- [ ] 02-01-PLAN.md — Pure functions (computeOutcomeStatus + counts) with TDD
+- [x] 02-01-PLAN.md — Pure functions (computeOutcomeStatus + counts) with TDD
 - [ ] 02-02-PLAN.md — GoalSpacePanel component + GraphOSSurface routing
 
 ### Phase 3: Capture Linking + Extraction
