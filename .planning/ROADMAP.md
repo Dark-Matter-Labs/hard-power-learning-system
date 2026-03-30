@@ -78,7 +78,10 @@ Plans:
   1. A convergence score can be computed for any goal space using the defined positive/negative weight rules (verifiable via API or function call)
   2. convergence_snapshots table exists and stores scores with timestamp and factor breakdown as JSONB
   3. A snapshot is taken automatically when 10 or more new nodes have been added since the last snapshot
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — Pure convergence scoring function (TDD) + convergence_snapshots migration
+- [ ] 04-02-PLAN.md — Snapshot API route + threshold trigger in nodes POST
 
 ### Phase 5: Trajectory Indicators
 **Goal**: Every goal space displays a live trajectory badge and a 30-day convergence sparkline so users can see at a glance whether they are converging or drifting
@@ -124,7 +127,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 1. Goal Hierarchy | 0/2 | Not started | - |
 | 2. Goal Space Panel | 1/2 | Complete    | 2026-03-27 |
 | 3. Capture Linking + Extraction | 0/2 | Not started | - |
-| 4. Convergence Computation | 0/TBD | Not started | - |
+| 4. Convergence Computation | 0/2 | Not started | - |
 | 5. Trajectory Indicators | 0/TBD | Not started | - |
 | 6. Reflection Agent | 0/TBD | Not started | - |
 | 7. Reflection Session Page | 0/TBD | Not started | - |
