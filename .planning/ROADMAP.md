@@ -80,7 +80,7 @@ Plans:
   3. A snapshot is taken automatically when 10 or more new nodes have been added since the last snapshot
 **Plans:** 2 plans
 Plans:
-- [ ] 04-01-PLAN.md — Pure convergence scoring function (TDD) + convergence_snapshots migration
+- [x] 04-01-PLAN.md — Pure convergence scoring function (TDD) + convergence_snapshots migration (completed 2026-03-27)
 - [ ] 04-02-PLAN.md — Snapshot API route + threshold trigger in nodes POST
 
 ### Phase 5: Trajectory Indicators
@@ -127,7 +127,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 1. Goal Hierarchy | 0/2 | Not started | - |
 | 2. Goal Space Panel | 1/2 | Complete    | 2026-03-27 |
 | 3. Capture Linking + Extraction | 0/2 | Not started | - |
-| 4. Convergence Computation | 0/2 | Not started | - |
+| 4. Convergence Computation | 1/2 | In progress | - |
 | 5. Trajectory Indicators | 0/TBD | Not started | - |
 | 6. Reflection Agent | 0/TBD | Not started | - |
 | 7. Reflection Session Page | 0/TBD | Not started | - |

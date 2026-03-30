@@ -35,8 +35,8 @@
 
 ### Convergence
 
-- [ ] **CONV-01**: System computes convergence score per goal space using defined positive/negative weight rules
-- [ ] **CONV-02**: convergence_snapshots table stores scores with timestamp and factor breakdown (JSONB)
+- [x] **CONV-01**: System computes convergence score per goal space using defined positive/negative weight rules
+- [x] **CONV-02**: convergence_snapshots table stores scores with timestamp and factor breakdown (JSONB)
 - [ ] **CONV-03**: Convergence snapshots taken on-demand and triggered when 10+ new nodes added since last snapshot
 - [ ] **CONV-04**: Trajectory indicator badge shows converging (+) / neutral / drifting (-) with numeric score
 - [ ] **CONV-05**: Clicking trajectory badge expands to show positive and negative factor breakdown
@@ -101,8 +101,8 @@
 | EXTR-02 | Phase 3 | Complete |
 | EXTR-03 | Phase 3 | Complete |
 | EXTR-04 | Phase 3 | Complete |
-| CONV-01 | Phase 4 | Pending |
-| CONV-02 | Phase 4 | Pending |
+| CONV-01 | Phase 4 | Complete |
+| CONV-02 | Phase 4 | Complete |
 | CONV-03 | Phase 4 | Pending |
 | CONV-04 | Phase 5 | Pending |
 | CONV-05 | Phase 5 | Pending |

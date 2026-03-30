@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-capture-linking-extraction/03-02-PLAN.md
-last_updated: "2026-03-27T21:30:00.000Z"
-last_activity: 2026-03-27 -- Phase 03 Plan 02 completed
+stopped_at: Completed 04-convergence-computation/04-01-PLAN.md
+last_updated: "2026-03-27T11:49:00.000Z"
+last_activity: 2026-03-27 -- Phase 04 Plan 01 executed: convergence scoring function + migration
 progress:
   total_phases: 7
-  completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
-  percent: 43
+  completed_phases: 3
+  total_plans: 8
+  completed_plans: 7
+  percent: 50
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** The system must always tell you whether your exploration and your commitments are spiraling together toward your goals — or apart.
-**Current focus:** Phase 03 — capture-linking-extraction
+**Current focus:** Phase 04 — convergence-computation
 
 ## Current Position
 
-Phase: 03 (capture-linking-extraction) — COMPLETE
-Plan: 2 of 2 (both complete)
-Status: Phase 03 complete
-Last activity: 2026-03-27 -- Phase 03 Plan 02 completed
+Phase: 04 (convergence-computation) — EXECUTING
+Plan: 1 of 2 (complete)
+Status: Executing Phase 04
+Last activity: 2026-03-27 -- Phase 04 Plan 01 executed: convergence scoring function + migration
 
-Progress: [████░░░░░░] 43%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [████░░░░░░] 43%
 *Updated after each plan completion*
 | Phase 02-goal-space-panel P02-02 | 3min | 2 tasks | 3 files |
 | Phase 03-capture-linking-extraction P03-01 | 15min | 3 tasks | 5 files |
+| Phase 04-convergence-computation P04-01 | 15min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,8 @@ Recent decisions affecting current work:
 - [Phase 03-capture-linking-extraction]: Added goal_relevance and expected_signals to LlmExtraction type (03-01 parallel dependency)
 - [Phase 03-capture-linking-extraction]: goalRelevanceActions stored separately from fields in ReviewCard to isolate goal relevance state
 - [Phase 03-capture-linking-extraction]: targets_outcome edges created at promotion time by scanning goal_relevance_* keys in review.fields
+- [Phase 04-convergence-computation]: no_attention penalty applies only when zero targets_outcome AND zero assigned_to_outcome edges — indicates_progress edges alone do not count as attention
+- [Phase 04-convergence-computation]: falsified/suspended status overrides positive weight — node contributes only negative factor, positive evaluation is skipped
 
 ### Pending Todos
 
@@ -84,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T10:15:00.000Z
-Stopped at: Completed 03-capture-linking-extraction/03-01-PLAN.md (back-filled)
+Last session: 2026-03-27T11:49:00.000Z
+Stopped at: Completed 04-convergence-computation/04-01-PLAN.md
 Resume file: None
