@@ -68,7 +68,7 @@ Plans:
 **Plans:** 2 plans
 Plans:
 - [ ] 03-01-PLAN.md — Capture form outcome dropdown + expected signals + extraction agent goal context
-- [ ] 03-02-PLAN.md — Weekly review undirected hunches + GoalRelevanceField in ReviewCard
+- [x] 03-02-PLAN.md — Weekly review undirected hunches + GoalRelevanceField in ReviewCard (completed 2026-03-27)
 
 ### Phase 4: Convergence Computation
 **Goal**: The system computes a convergence score per goal space using defined weight rules, stores snapshots as a time series, and triggers snapshots automatically on threshold
