@@ -46,10 +46,10 @@ The system must always tell you whether your exploration and your commitments ar
 - [x] Goal space detail panel with progress indicators — Phase 2
 - [ ] Hunch-to-outcome linking in capture forms
 - [ ] Extraction agent goal context injection and relevance suggestion
-- [ ] Convergence scoring function per goal space
-- [ ] convergence_snapshots table for time-series storage
-- [ ] Trajectory indicator badge on goal spaces
-- [ ] Trajectory sparkline (SVG, 30-day window)
+- [x] Convergence scoring function per goal space — Validated in Phase 4: Convergence Computation
+- [x] convergence_snapshots table for time-series storage — Validated in Phase 4: Convergence Computation
+- [x] Trajectory indicator badge on goal spaces — Validated in Phase 5: Trajectory Indicators
+- [x] Trajectory sparkline (SVG, 30-day window) — Validated in Phase 5: Trajectory Indicators
 - [ ] Reflection agent (system-wide analysis)
 - [ ] Reflection report UI (weekly review integration)
 - [ ] /reflect page with guided questions, decisions log, session storage
@@ -91,8 +91,8 @@ The system must always tell you whether your exploration and your commitments ar
 | Left sidebar for commitments | Right sidebar used by node detail panel | ✓ Good |
 | Permissive RLS with auth whitelist | Small known team, simplicity over granular permissions | ✓ Good |
 | Configurable LLM agent slots | Allows model swapping without code changes | ✓ Good |
-| Trajectory badge (Option C) over spiral SVG | Practical for v0.4; spiral deferred to design pass | — Pending |
-| Rough convergence weights | Purpose is visibility not optimization; tune over real usage | — Pending |
+| Trajectory badge (Option C) over spiral SVG | Practical for v0.4; spiral deferred to design pass | ✓ Shipped Phase 5 |
+| Rough convergence weights | Purpose is visibility not optimization; tune over real usage | ✓ Shipped Phase 4 |
 
 ## Evolution
 
