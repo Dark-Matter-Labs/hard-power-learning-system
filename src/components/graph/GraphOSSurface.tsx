@@ -309,6 +309,7 @@ export function GraphOSSurface() {
           onClose={() => setCapturePos(null)}
           onCreated={handleNodeCreated}
           goalSpaces={goalSpaces}
+          triggerOutcomes={triggerOutcomes}
         />
       )}
 
