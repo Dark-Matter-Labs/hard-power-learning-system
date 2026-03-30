@@ -34,13 +34,15 @@ export async function GET(request: Request) {
         }
       : null;
 
-    // Query 2: 30-day history (for sparkline — lean, no factor_breakdown)
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    // Query 2: Configurable history window (for sparkline — lean, no factor_breakdown)
+    const daysParam = searchParams.get('days');
+    const days = Math.min(90, Math.max(1, parseInt(daysParam ?? '30', 10)));
+    const windowStart = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
     const { data: historyRows } = await supabase
       .from('convergence_snapshots')
       .select('score, computed_at')
       .eq('goal_space_id', goalSpaceId)
-      .gte('computed_at', thirtyDaysAgo)
+      .gte('computed_at', windowStart)
       .order('computed_at', { ascending: true });
 
     const history = (historyRows ?? []).map(row => ({
