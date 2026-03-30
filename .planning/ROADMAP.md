@@ -106,7 +106,11 @@ Plans:
   3. Reflection auto-triggers when 10 or more new nodes have been added since the last reflection run
   4. Weekly review page renders the reflection report as an expandable section with Patterns, Contradictions, Coverage Gaps, Trajectory, and Recommendations sections
   5. Each recommendation in the report has an action button that opens the appropriate form or panel
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 06-01-PLAN.md — Pure reflection agent functions (TDD) + DB migration + LLM slot extension
+- [ ] 06-02-PLAN.md — Streaming route handler + threshold trigger
+- [ ] 06-03-PLAN.md — ReflectionPanel UI component + weekly review integration
 
 ### Phase 7: Reflection Session Page
 **Goal**: /reflect is a dedicated page for periodic deep reflection rituals where users view trajectory over time, answer guided questions, and log decisions — all persisted to a reflection_sessions record
@@ -132,5 +136,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. Capture Linking + Extraction | 0/2 | Not started | - |
 | 4. Convergence Computation | 1/2 | In progress | - |
 | 5. Trajectory Indicators | 1/2 | In Progress|  |
-| 6. Reflection Agent | 0/TBD | Not started | - |
+| 6. Reflection Agent | 0/3 | Not started | - |
 | 7. Reflection Session Page | 0/TBD | Not started | - |
