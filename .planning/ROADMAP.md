@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Capture Linking + Extraction** - Outcome dropdown in capture forms and goal-aware extraction agent (completed 2026-03-30)
 - [ ] **Phase 4: Convergence Computation** - Scoring function and convergence_snapshots time-series table
 - [ ] **Phase 5: Trajectory Indicators** - Badge UI, factor breakdown, and 30-day sparkline SVG
-- [ ] **Phase 6: Reflection Agent** - System-wide LLM analysis integrated into weekly review
+- [x] **Phase 6: Reflection Agent** - System-wide LLM analysis integrated into weekly review (completed 2026-03-30)
 - [ ] **Phase 7: Reflection Session Page** - /reflect page with guided questions, decisions log, and session persistence
 
 ## Phase Details
@@ -106,11 +106,11 @@ Plans:
   3. Reflection auto-triggers when 10 or more new nodes have been added since the last reflection run
   4. Weekly review page renders the reflection report as an expandable section with Patterns, Contradictions, Coverage Gaps, Trajectory, and Recommendations sections
   5. Each recommendation in the report has an action button that opens the appropriate form or panel
-**Plans:** 1/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 06-01-PLAN.md — Pure reflection agent functions (TDD) + DB migration + LLM slot extension
-- [ ] 06-02-PLAN.md — Streaming route handler + threshold trigger
-- [ ] 06-03-PLAN.md — ReflectionPanel UI component + weekly review integration
+- [x] 06-02-PLAN.md — Streaming route handler + threshold trigger
+- [x] 06-03-PLAN.md — ReflectionPanel UI component + weekly review integration
 
 ### Phase 7: Reflection Session Page
 **Goal**: /reflect is a dedicated page for periodic deep reflection rituals where users view trajectory over time, answer guided questions, and log decisions — all persisted to a reflection_sessions record
@@ -136,5 +136,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. Capture Linking + Extraction | 0/2 | Not started | - |
 | 4. Convergence Computation | 1/2 | In progress | - |
 | 5. Trajectory Indicators | 1/2 | In Progress|  |
-| 6. Reflection Agent | 1/3 | In Progress|  |
+| 6. Reflection Agent | 3/3 | Complete   | 2026-03-30 |
 | 7. Reflection Session Page | 0/TBD | Not started | - |
