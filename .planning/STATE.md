@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v0.4
 milestone_name: milestone
 status: executing
-stopped_at: Completed 07-02-PLAN.md — /reflect page human-verified and complete
-last_updated: "2026-03-30T23:19:07.027Z"
+stopped_at: Completed 08-02-PLAN.md — graph dark/light mode complete
+last_updated: "2026-03-31T12:27:10.047Z"
 last_activity: 2026-03-31
 progress:
   total_phases: 7
@@ -61,6 +61,7 @@ Progress: [█████░░░░░] 57%
 | Phase 06-reflection-agent P02 | 3 | 2 tasks | 3 files |
 | Phase 06-reflection-agent P03 | 45min | 4 tasks | 3 files |
 | Phase 07-reflection-session-page P02 | 3 | 3 tasks | 7 files |
+| Phase 08-layout-theme P02 | 16min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,9 @@ Recent decisions affecting current work:
 - [Phase 06-reflection-agent]: initialReport prop added to ReflectionPanel for test isolation — avoids mocking fetch/ReadableStream in unit tests while covering all rendering paths
 - [Phase 07-reflection-session-page]: NavBar Reflect link positioned between Review and Settings to frame /reflect as post-review ritual
 - [Phase 07-reflection-session-page]: ReflectClient pre-fills answers from lastSession.human_responses in useState initializer to avoid extra useEffect sync
+- [Phase 08-layout-theme]: isDark check placed once at top of useEffect body in GraphCanvas — captures theme at render time, no reactive listener needed
+- [Phase 08-layout-theme]: Filter pill inactive state moved from inline style to Tailwind className conditional — enables dark: variants; active state keeps inline style for dynamic type color
+- [Phase 08-layout-theme]: D3 SVG pattern: read isDark once before createElement calls, define named constants for all color variants
 
 ### Pending Todos
 
@@ -106,6 +110,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T23:08:44.132Z
-Stopped at: Completed 07-02-PLAN.md — /reflect page human-verified and complete
+Last session: 2026-03-31T12:27:10.045Z
+Stopped at: Completed 08-02-PLAN.md — graph dark/light mode complete
 Resume file: None
