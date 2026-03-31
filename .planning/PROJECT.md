@@ -42,8 +42,8 @@ The system must always tell you whether your exploration and your commitments ar
 
 ### Active (v0.5)
 
-- [ ] Nav panel content no longer obscured by fixed navbar (padding fix)
-- [ ] Full light/dark mode consistency — no hardcoded colors
+- ✓ Nav panel content no longer obscured by fixed navbar (padding fix) — Validated Phase 8
+- ✓ Full light/dark mode consistency — no hardcoded colors — Validated Phase 8
 - [ ] Review card defaults all fields to checked (opt-out model)
 - [ ] Shared CAPTURE_TYPES config used by both capture page and inline graph card
 - [ ] Capture page renamed; meeting notes/transcript type added with multi-node extraction
@@ -70,6 +70,7 @@ The system must always tell you whether your exploration and your commitments ar
 - ✓ Trajectory badge + sparkline — v0.4 Phase 5
 - ✓ Reflection agent + report UI — v0.4 Phase 6
 - ✓ /reflect page with session persistence — v0.4 Phase 7
+- ✓ Light/dark mode with system-preference detection, navbar padding fix — v0.5 Phase 8
 
 ### Out of Scope
 
@@ -114,7 +115,7 @@ The system must always tell you whether your exploration and your commitments ar
 
 This document evolves at phase transitions and milestone boundaries.
 
-Last updated: 2026-03-31 — milestone v0.5 started
+Last updated: 2026-03-31
 
 **After each phase transition** (via `/gsd:transition`):
 1. Requirements invalidated? → Move to Out of Scope with reason
@@ -130,4 +131,4 @@ Last updated: 2026-03-31 — milestone v0.5 started
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-27 after Phase 2 completion*
+*Last updated: 2026-03-31
