@@ -1,8 +1,14 @@
 @import "tailwindcss";
 
 :root {
+  --nav-height: 49px;
   --background: #ffffff;
   --foreground: #171717;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 @theme inline {
@@ -32,13 +38,6 @@
   --font-mono: 'JetBrains Mono', monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
@@ -53,8 +52,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #d1d5db;
   border-radius: 3px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #333;
 }
 
 /* Skeleton animation */
@@ -67,6 +69,6 @@ body {
 }
 
 .page-with-nav {
-  padding-top: 49px;
+  padding-top: var(--nav-height);
   min-height: 100vh;
 }
