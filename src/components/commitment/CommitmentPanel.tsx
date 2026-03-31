@@ -115,11 +115,11 @@ export function CommitmentPanel({
 
   if (collapsed) {
     return (
-      <div className="absolute left-0 top-[49px] bottom-0 w-6 flex flex-col items-center pt-3 bg-gray-950 border-r border-gray-800/50 z-10">
+      <div className="absolute left-0 top-[49px] bottom-0 w-6 flex flex-col items-center pt-3 bg-white dark:bg-gray-950 border-r border-gray-200/80 dark:border-gray-800/50 z-10">
         <button
           type="button"
           onClick={() => setCollapsed(false)}
-          className="text-gray-600 hover:text-gray-400"
+          className="text-gray-400 hover:text-gray-600 dark:text-gray-600 dark:hover:text-gray-400"
           title="Expand commitment panel"
         >
           ‹
@@ -132,14 +132,14 @@ export function CommitmentPanel({
   }
 
   return (
-    <div className="absolute left-0 top-[49px] bottom-0 w-[260px] bg-gray-950 border-r border-gray-800/50 z-10 flex flex-col overflow-hidden">
+    <div className="absolute left-0 top-[49px] bottom-0 w-[260px] bg-white dark:bg-gray-950 border-r border-gray-200/80 dark:border-gray-800/50 z-10 flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-800/50 shrink-0">
-        <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Commitments</span>
+      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200/80 dark:border-gray-800/50 shrink-0">
+        <span className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Commitments</span>
         <button
           type="button"
           onClick={() => setCollapsed(true)}
-          className="text-gray-600 hover:text-gray-400 text-sm"
+          className="text-gray-400 hover:text-gray-600 dark:text-gray-600 dark:hover:text-gray-400 text-sm"
           title="Collapse"
         >
           ‹
@@ -173,7 +173,7 @@ export function CommitmentPanel({
           <div className="pt-2">
             {goalSpaces.length > 0 && (
               <div className="px-3 pb-1">
-                <span className="text-[9px] text-gray-600 uppercase tracking-wide">Unlinked</span>
+                <span className="text-[9px] text-gray-500 dark:text-gray-600 uppercase tracking-wide">Unlinked</span>
               </div>
             )}
             <div className="px-3">
@@ -196,7 +196,7 @@ export function CommitmentPanel({
         {/* Empty state */}
         {goalSpaces.length === 0 && commitments.length === 0 && (
           <div className="px-3 pt-3">
-            <p className="text-[10px] text-gray-600 italic">No commitments yet</p>
+            <p className="text-[10px] text-gray-500 dark:text-gray-600 italic">No commitments yet</p>
           </div>
         )}
 
@@ -205,7 +205,7 @@ export function CommitmentPanel({
           <button
             type="button"
             onClick={onAddCommitment}
-            className="w-full text-[10px] text-gray-600 hover:text-gray-400 border border-dashed border-gray-800 hover:border-gray-700 rounded py-1.5 transition-colors"
+            className="w-full text-[10px] text-gray-500 hover:text-gray-700 dark:text-gray-600 dark:hover:text-gray-400 border border-dashed border-gray-300 hover:border-gray-400 dark:border-gray-800 dark:hover:border-gray-700 rounded py-1.5 transition-colors"
           >
             + Add commitment
           </button>
@@ -213,8 +213,8 @@ export function CommitmentPanel({
 
         {/* Tension alerts */}
         {activeTensions.length > 0 && (
-          <div className="border-t border-gray-800/50 px-3 pt-3">
-            <div className="text-[9px] text-gray-600 uppercase tracking-wide mb-2">
+          <div className="border-t border-gray-200/80 dark:border-gray-800/50 px-3 pt-3">
+            <div className="text-[9px] text-gray-500 dark:text-gray-600 uppercase tracking-wide mb-2">
               Tensions ({activeTensions.length})
             </div>
             {activeTensions.map(alert => (

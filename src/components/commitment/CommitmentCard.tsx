@@ -15,10 +15,10 @@ interface CommitmentCardProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  active:   'text-emerald-400',
-  proposed: 'text-amber-400',
+  active:   'text-emerald-600 dark:text-emerald-400',
+  proposed: 'text-amber-600 dark:text-amber-400',
   achieved: 'text-gray-500',
-  abandoned:'text-gray-600',
+  abandoned:'text-gray-500 dark:text-gray-600',
 };
 
 function getCommitmentStatus(node: Node): string {
@@ -68,18 +68,18 @@ export function CommitmentCard({
       type="button"
       onClick={() => onSelect(commitment.id)}
       className={[
-        'w-full text-left border-l-[3px] border-[#185FA5] bg-gray-900 rounded-r-md mb-2 overflow-hidden',
-        'hover:bg-gray-800 transition-colors',
+        'w-full text-left border-l-[3px] border-[#185FA5] bg-gray-50 dark:bg-gray-900 rounded-r-md mb-2 overflow-hidden',
+        'hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors',
         isSelected ? 'ring-1 ring-[#185FA5]/60' : '',
       ].join(' ')}
     >
       <div className="p-2.5">
         <div className="flex items-start justify-between gap-1 mb-1">
-          <span className="text-xs font-semibold text-gray-200 leading-snug flex-1 min-w-0">
+          <span className="text-xs font-semibold text-gray-800 dark:text-gray-200 leading-snug flex-1 min-w-0">
             {commitment.title}
           </span>
           {commitment.author_id && (
-            <span className="shrink-0 w-5 h-5 rounded-full bg-gray-700 flex items-center justify-center text-[9px] text-gray-400 font-bold">
+            <span className="shrink-0 w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[9px] text-gray-600 dark:text-gray-400 font-bold">
               {commitment.author_id.slice(0, 2).toUpperCase()}
             </span>
           )}
@@ -96,15 +96,15 @@ export function CommitmentCard({
             ● {status.charAt(0).toUpperCase() + status.slice(1)}
           </span>
           {allocation !== null && (
-            <span className="text-[10px] text-gray-600">{allocation}%</span>
+            <span className="text-[10px] text-gray-500 dark:text-gray-600">{allocation}%</span>
           )}
         </div>
       </div>
 
       {/* Linked assumptions */}
       {linkedAssumptions.length > 0 && (
-        <div className="border-t border-gray-800 px-2.5 py-2">
-          <div className="text-[9px] text-gray-600 uppercase tracking-wide mb-1">Depends on</div>
+        <div className="border-t border-gray-200 dark:border-gray-800 px-2.5 py-2">
+          <div className="text-[9px] text-gray-500 dark:text-gray-600 uppercase tracking-wide mb-1">Depends on</div>
           <div className="flex flex-wrap gap-1">
             {linkedAssumptions.map(assumption => (
               <button
@@ -114,7 +114,7 @@ export function CommitmentCard({
                   e.stopPropagation();
                   onAssumptionClick(assumption.id);
                 }}
-                className="text-[10px] bg-gray-800 hover:bg-gray-700 text-gray-400 px-1.5 py-0.5 rounded truncate max-w-[100px]"
+                className="text-[10px] bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 px-1.5 py-0.5 rounded truncate max-w-[100px]"
                 title={assumption.title}
               >
                 {assumption.title.length > 14 ? assumption.title.slice(0, 13) + '…' : assumption.title}
