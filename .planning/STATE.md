@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.5
 milestone_name: UX Polish
-status: executing
-stopped_at: Completed 13-01-PLAN.md — NodeDetailPanel edit mode implemented and tested
-last_updated: "2026-04-01T10:19:09.963Z"
+status: verifying
+stopped_at: Completed 13-02-PLAN.md — connection management in NodeDetailPanel
+last_updated: "2026-04-01T10:31:24.792Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 12
-  completed_plans: 11
-  percent: 71
+  completed_plans: 12
+  percent: 92
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 
 ## Current Position
 
-Phase: 13 (Edit Nodes & Connections) — EXECUTING
+Phase: 13 (Edit Nodes & Connections) — COMPLETE
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-01
 
-Progress: [███████░░░] 71%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: [███████░░░] 71%
 | Phase 12-people-participants P01 | 20min | 2 tasks | 6 files |
 | Phase 12-people-participants P02 | 8min | 2 tasks | 5 files |
 | Phase 13-edit-nodes-connections P13-01 | 3min | 2 tasks | 4 files |
+| Phase 13-edit-nodes-connections P13-02 | 18min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,9 @@ Recent decisions affecting current work:
 - [Phase 12-people-participants]: participated_in edge type for manual participant tagging (semantically distinct from authored_by); mentioned_in for extraction-detected mentions
 - [Phase 13-edit-nodes-connections]: Status select restricted to promoted/archived/falsified/suspended — system states hidden from users
 - [Phase 13-edit-nodes-connections]: NODE_TYPE_OPTIONS defined inline in NodeDetailPanel to keep component self-contained
+- [Phase 13-edit-nodes-connections]: Remove button uses opacity-0 group-hover pattern — visible on hover only to reduce visual noise
+- [Phase 13-edit-nodes-connections]: addEdgeType state typed as string to allow select onChange assignment without type narrowing issues
+- [Phase 13-edit-nodes-connections]: Connections section always rendered in view mode to keep Add connection button always accessible
 
 ### Pending Todos
 
@@ -106,6 +110,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T10:19:09.961Z
-Stopped at: Completed 13-01-PLAN.md — NodeDetailPanel edit mode implemented and tested
+Last session: 2026-04-01T10:31:24.790Z
+Stopped at: Completed 13-02-PLAN.md — connection management in NodeDetailPanel
 Resume file: None
