@@ -54,7 +54,7 @@ export function GoalSpacePanel({ node, edges, allNodes, onClose }: GoalSpacePane
     : 'pending';
 
   return (
-    <div className="absolute right-0 top-[49px] bottom-0 w-72 bg-white dark:bg-gray-950 border-l border-gray-200 dark:border-gray-800 p-4 overflow-y-auto">
+    <div className="absolute right-0 top-[49px] bottom-0 w-72 bg-white dark:bg-gray-950 border-l border-gray-200 dark:border-gray-800 p-4 overflow-y-auto z-30">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <NodeTypeBadge nodeType={node.node_type} />

@@ -257,7 +257,7 @@ export function NodeDetailPanel({
   const panelWidth = isEditing ? 'w-96' : 'w-72';
 
   return (
-    <div className={`absolute right-0 top-[49px] bottom-0 ${panelWidth} bg-white dark:bg-gray-950 border-l border-gray-200 dark:border-gray-800 p-4 overflow-y-auto transition-all duration-150`}>
+    <div className={`absolute right-0 top-[49px] bottom-0 ${panelWidth} bg-white dark:bg-gray-950 border-l border-gray-200 dark:border-gray-800 p-4 overflow-y-auto transition-all duration-150 z-30`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <NodeTypeBadge nodeType={isEditing ? editNodeType : node.node_type} />
