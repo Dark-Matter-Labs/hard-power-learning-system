@@ -48,3 +48,6 @@ next-env.d.ts
 .superpowers/
 
 .claude/worktrees/*
+
+# worktrees
+.worktrees/
