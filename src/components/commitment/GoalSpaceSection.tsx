@@ -21,6 +21,7 @@ interface GoalSpaceSectionProps {
   readonly selectedCommitmentId: string | null;
   readonly onSelectCommitment: (id: string) => void;
   readonly onAssumptionClick: (assumptionId: string) => void;
+  readonly onEdit?: (id: string) => void;
 }
 
 export function GoalSpaceSection({
@@ -34,6 +35,7 @@ export function GoalSpaceSection({
   selectedCommitmentId,
   onSelectCommitment,
   onAssumptionClick,
+  onEdit,
 }: GoalSpaceSectionProps) {
   const [expanded, setExpanded] = useState(true);
   const [convergenceData, setConvergenceData] = useState<ConvergenceData | null>(null);
@@ -120,6 +122,7 @@ export function GoalSpaceSection({
                           isSelected={selectedCommitmentId === c.id}
                           onSelect={onSelectCommitment}
                           onAssumptionClick={onAssumptionClick}
+                          onEdit={onEdit ? () => onEdit(c.id) : undefined}
                         />
                       </div>
                     ))}
@@ -144,6 +147,7 @@ export function GoalSpaceSection({
                     isSelected={selectedCommitmentId === c.id}
                     onSelect={onSelectCommitment}
                     onAssumptionClick={onAssumptionClick}
+                    onEdit={onEdit ? () => onEdit(c.id) : undefined}
                   />
                 </div>
               ))}
