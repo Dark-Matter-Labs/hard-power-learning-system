@@ -73,6 +73,12 @@ describe('CommitmentCardEditor', () => {
     fireEvent.click(screen.getByText('Save'));
     await waitFor(() => {
       expect(screen.getByText('Failed to save')).toBeTruthy();
+      expect((screen.getByText('Save') as HTMLButtonElement).disabled).toBe(false);
     });
+  });
+
+  it('auto-focuses the title input on mount', () => {
+    render(<CommitmentCardEditor commitment={baseCommitment} onSave={vi.fn()} onCancel={vi.fn()} />);
+    expect(document.activeElement).toBe(screen.getByPlaceholderText('Title'));
   });
 });
