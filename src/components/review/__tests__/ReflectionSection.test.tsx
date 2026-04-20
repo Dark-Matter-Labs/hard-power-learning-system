@@ -74,4 +74,29 @@ describe('ReflectionSection', () => {
       expect(screen.getByText(/Reflection failed/)).toBeTruthy();
     });
   });
+
+  it('sends site filter payload after selecting a site', async () => {
+    vi.mocked(global.fetch).mockResolvedValue({
+      ok: true,
+      json: async () => ({ synthesis: 'Site synthesis.' }),
+    } as Response);
+
+    render(
+      <ReflectionSection
+        sites={[{ id: 's1', label: 'Madrid', type: 'site' }]}
+        options={[]}
+        goalSpaces={[]}
+      />
+    );
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'site::s1' } });
+    fireEvent.click(screen.getByRole('button', { name: /run reflection/i }));
+    await waitFor(() => {
+      expect(vi.mocked(global.fetch)).toHaveBeenCalledWith(
+        '/api/reflect/analyse',
+        expect.objectContaining({
+          body: JSON.stringify({ type: 'site', value: 's1', label: 'Madrid' }),
+        }),
+      );
+    });
+  });
 });
