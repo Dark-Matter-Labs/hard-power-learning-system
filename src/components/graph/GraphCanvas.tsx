@@ -376,7 +376,7 @@ export function GraphCanvas({ nodes, edges, activeTypes, view, onSelectNode, onS
 
     // Node type label — non-commitment nodes only
     cardG.filter(d => d.data.node_type !== 'commitment')
-      .append('text').text(d => d.node_type.replace(/_/g, ' '))
+      .append('text').text(d => d.data.node_type.replace(/_/g, ' '))
       .attr('x', 12).attr('y', 20).attr('font-size', 9).attr('fill', d => d.color)
       .attr('font-weight', '600').attr('letter-spacing', '0.05em');
 
@@ -408,6 +408,7 @@ export function GraphCanvas({ nodes, edges, activeTypes, view, onSelectNode, onS
 
     // Dual-model indicators
     cardG.each(function(d) {
+      if (d.data.node_type === 'commitment') return;
       const el = d3.select(this);
       const nt = d.data.node_type;
       if (nt === 'assumption_background' || nt === 'assumption_foreground') {
