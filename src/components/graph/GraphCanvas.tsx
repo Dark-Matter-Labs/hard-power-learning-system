@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import * as d3 from 'd3';
 import type { Node } from '@/lib/types/nodes';
 import type { Edge } from '@/lib/types/edges';
@@ -274,12 +274,13 @@ export function GraphCanvas({ nodes, edges, activeTypes, view, onSelectNode, onS
   const graphNodes = filteredNodes.map(toGraphNode);
   const graphLinks = filteredEdges.map(toGraphLink);
 
-  const nodeGoalMap = new Map<string, string>();
-  filteredEdges.forEach(e => {
-    if (e.edge_type === 'belongs_to_goalspace') {
-      nodeGoalMap.set(e.source_id, e.target_id);
-    }
-  });
+  const nodeGoalMap = useMemo(() => {
+    const map = new Map<string, string>();
+    filteredEdges.forEach(e => {
+      if (e.edge_type === 'belongs_to_goalspace') map.set(e.source_id, e.target_id);
+    });
+    return map;
+  }, [filteredEdges]);
 
   const handleCanvasClick = useCallback((event: React.MouseEvent<SVGSVGElement>) => {
     if ((event.target as SVGElement).closest('.node-card')) return;
@@ -546,7 +547,7 @@ export function GraphCanvas({ nodes, edges, activeTypes, view, onSelectNode, onS
     }
 
     return () => {};
-  }, [filteredNodes.length, filteredEdges.length, activeTypes, view]);
+  }, [filteredNodes.length, filteredEdges.length, activeTypes, view, nodeGoalMap]);
 
   // Highlight effect (independent of layout)
   useEffect(() => {
@@ -583,7 +584,7 @@ export function GraphCanvas({ nodes, edges, activeTypes, view, onSelectNode, onS
 
     if (!focusedNodeId) {
       svg.selectAll<SVGGElement, GraphNode>('.node-card').attr('opacity', null);
-      svg.selectAll<SVGPathElement, GraphLink>('.links path').attr('stroke-opacity', 0.6);
+      svg.selectAll<SVGPathElement, GraphLink>('.links path').attr('stroke-opacity', null);
       return;
     }
 
