@@ -66,6 +66,23 @@ describe('GraphBottomBar', () => {
     expect(onFocusNode).not.toHaveBeenCalled();
   });
 
+  it('does not call onFocusNode when search input is cleared', () => {
+    const onFocusNode = vi.fn();
+    const nodes = [makeNode('abc', 'Pricing hunch')];
+    render(
+      <GraphBottomBar
+        onFitView={vi.fn()} view="force" onChangeView={vi.fn()}
+        nodes={nodes} onFocusNode={onFocusNode}
+      />
+    );
+    const input = screen.getByPlaceholderText(/find node/i);
+    fireEvent.change(input, { target: { value: 'pricing' } });
+    expect(onFocusNode).toHaveBeenCalledOnce();
+    fireEvent.change(input, { target: { value: '' } });
+    // clearing the input must not trigger a second call
+    expect(onFocusNode).toHaveBeenCalledOnce();
+  });
+
   it('calls onChangeView when a layout button is clicked', () => {
     const onChangeView = vi.fn();
     render(
