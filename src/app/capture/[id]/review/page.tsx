@@ -41,11 +41,12 @@ export default function ReviewPage() {
   const [node, setNode] = useState<Node | null>(null);
   const [childNodes, setChildNodes] = useState<Node[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchNode = async () => {
       const supabase = createClient();
-      const [{ data: nodeData }, { data: childNodesData }] = await Promise.all([
+      const [{ data: nodeData, error: nodeError }, { data: childNodesData }] = await Promise.all([
         supabase.from('nodes').select('*').eq('id', params.id).single(),
         supabase
           .from('nodes')
@@ -53,7 +54,11 @@ export default function ReviewPage() {
           .eq('parent_node_id', params.id as string)
           .order('created_at', { ascending: true }),
       ]);
-      if (nodeData) setNode(nodeData as unknown as Node);
+      if (nodeError || !nodeData) {
+        setFetchError('Failed to load entry.');
+        return;
+      }
+      setNode(nodeData as unknown as Node);
       if (childNodesData) setChildNodes(childNodesData as unknown as Node[]);
     };
     fetchNode();
@@ -75,10 +80,11 @@ export default function ReviewPage() {
         connections_added: [],
       };
 
-      await supabase
+      const { error: updateError } = await supabase
         .from('nodes')
         .update({ human_review: humanReview, status: 'promoted' })
         .eq('id', nodeId);
+      if (updateError) throw updateError;
 
       // Auto-accept all LLM-suggested connections
       const suggested = node?.llm_extraction?.suggested_connections ?? [];
@@ -96,7 +102,10 @@ export default function ReviewPage() {
               return { source_id: nodeId, target_id: target.id, edge_type: conn.edge_type, weight: 1 };
             })
             .filter((e): e is NonNullable<typeof e> => e !== null);
-          if (edges.length > 0) await supabase.from('edges').insert(edges);
+          if (edges.length > 0) {
+            const { error: edgesError } = await supabase.from('edges').insert(edges);
+            if (edgesError) throw edgesError;
+          }
         }
       }
 
@@ -109,14 +118,16 @@ export default function ReviewPage() {
           edge_type: 'targets_outcome',
           weight: 1,
         }));
-        await supabase.from('edges').insert(goalEdges);
+        const { error: goalEdgesError } = await supabase.from('edges').insert(goalEdges);
+        if (goalEdgesError) throw goalEdgesError;
       }
 
-      await supabase.from('activity_log').insert({
+      const { error: activityError } = await supabase.from('activity_log').insert({
         action: 'promoted',
         target_node_id: nodeId,
         details: { from_status: node?.status },
       });
+      if (activityError) throw activityError;
 
       router.push('/capture');
     } finally {
@@ -128,16 +139,29 @@ export default function ReviewPage() {
     setIsSubmitting(true);
     try {
       const supabase = createClient();
-      await supabase.from('nodes').update({ status: 'archived' }).eq('id', params.id);
-      await supabase.from('activity_log').insert({
+      const { error: archiveError } = await supabase.from('nodes').update({ status: 'archived' }).eq('id', params.id);
+      if (archiveError) throw archiveError;
+      const { error: activityError } = await supabase.from('activity_log').insert({
         action: 'archived',
         target_node_id: params.id as string,
       });
+      if (activityError) throw activityError;
       router.push('/capture');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (fetchError) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8 text-center">
+        <p className="text-gray-400">{fetchError}</p>
+        <Link href="/capture" className="text-sm text-[#185FA5] mt-2 inline-block">
+          Back to capture
+        </Link>
+      </div>
+    );
+  }
 
   if (!node) {
     return (
