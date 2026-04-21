@@ -39,6 +39,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Only PDF, DOCX, and TXT files are supported' }, { status: 400 });
   }
 
+  const expectedExt = EXT_MAP[file.type];
+  const actualExt = file.name.split('.').pop()?.toLowerCase() ?? '';
+  if (actualExt !== expectedExt) {
+    return NextResponse.json({ error: 'File extension does not match file type' }, { status: 400 });
+  }
+
+  const safeFilename = file.name.replace(/[/\\]/g, '_');
+
   if (file.size > MAX_SIZE) {
     return NextResponse.json({ error: 'File must be under 10MB' }, { status: 400 });
   }
@@ -53,12 +61,13 @@ export async function POST(request: Request) {
     .upload(storage_path, arrayBuffer, { contentType: file.type, upsert: false });
 
   if (uploadError) {
+    console.error('[upload] Supabase storage error:', uploadError.message);
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   }
 
   return NextResponse.json({
     storage_path,
-    filename: file.name,
+    filename: safeFilename,
     mime_type: file.type,
     size: file.size,
   });
