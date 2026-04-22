@@ -91,4 +91,53 @@ describe('GuidedTour', () => {
       expect(screen.getByRole('button', { name: 'Retry' })).toBeDefined();
     });
   });
+
+  it('shows Next chapter button when not on last chapter', async () => {
+    global.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(mockTourResponse), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+    render(<GuidedTour allNodes={mockNodes} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Start guided tour' }));
+    await waitFor(() => screen.getAllByText('What is this system?'));
+    // Chapter 1 (index 0) is not the last — "Next chapter →" should appear
+    expect(screen.getByRole('button', { name: /Next chapter/i })).toBeDefined();
+  });
+
+  it('does not show Next chapter button on last chapter', async () => {
+    global.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(mockTourResponse), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+    render(<GuidedTour allNodes={mockNodes} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Start guided tour' }));
+    await waitFor(() => screen.getByText('Where attention is needed'));
+    // Navigate to last chapter (index 5)
+    fireEvent.click(screen.getByText('Where attention is needed'));
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: /Next chapter/i })).toBeNull();
+    });
+  });
+
+  it('does not re-fetch when navigating between chapters', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(mockTourResponse), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    );
+    global.fetch = fetchMock;
+    render(<GuidedTour allNodes={mockNodes} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Start guided tour' }));
+    await waitFor(() => screen.getByText('Our goals'));
+    // Navigate to multiple chapters
+    fireEvent.click(screen.getByText('Our goals'));
+    fireEvent.click(screen.getByText('Key assumptions'));
+    // fetch should only have been called once (the initial load)
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
 });

@@ -22,8 +22,9 @@ export function GuidedTour({ allNodes }: GuidedTourProps) {
 
   const allChapters: TourChapter[] = status === 'ready' ? [STATIC_CHAPTER_1, ...llmChapters] : [];
   const activeChapter = allChapters[activeIndex];
+  const chapterNodeIds = new Set(activeChapter?.nodeIds ?? []);
   const chapterNodes = activeChapter
-    ? allNodes.filter(n => (activeChapter.nodeIds as string[]).includes(n.id))
+    ? allNodes.filter(n => chapterNodeIds.has(n.id))
     : [];
 
   async function handleStart() {
@@ -32,7 +33,7 @@ export function GuidedTour({ allNodes }: GuidedTourProps) {
       const res = await fetch('/api/query/tour', { method: 'POST' });
       if (!res.ok) throw new Error('Tour failed');
       const data = await res.json() as TourResponse;
-      setLlmChapters([...data.chapters]);
+      setLlmChapters(data.chapters as TourChapter[]);
       setActiveIndex(0);
       setStatus('ready');
     } catch {
@@ -60,7 +61,7 @@ export function GuidedTour({ allNodes }: GuidedTourProps) {
   if (status === 'loading') {
     return (
       <div className="flex flex-col gap-6 pt-8">
-        {[1, 2, 3].map(i => (
+        {[1, 2, 3, 4, 5, 6].map(i => (
           <div key={i} className="animate-pulse">
             <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-32 mb-2" />
             <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded w-full mb-1" />
