@@ -113,4 +113,25 @@ describe('POST /api/query/tour', () => {
       if (saved) process.env.ANTHROPIC_API_KEY = saved;
     }
   });
+
+  it('returns 500 when LLM call fails', async () => {
+    const { default: Anthropic } = await import('@anthropic-ai/sdk') as { default: ReturnType<typeof vi.fn> };
+    Anthropic.mockImplementationOnce(function() {
+      return {
+        messages: {
+          create: vi.fn().mockRejectedValue(new Error('Network error')),
+        },
+      };
+    });
+    const res = await POST(makeRequest());
+    expect(res.status).toBe(500);
+  });
+
+  it('returns 500 when database query fails', async () => {
+    mockNodesSelect.mockReturnValue({
+      neq: vi.fn().mockResolvedValue({ data: null, error: new Error('DB error') }),
+    });
+    const res = await POST(makeRequest());
+    expect(res.status).toBe(500);
+  });
 });

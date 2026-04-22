@@ -13,6 +13,20 @@ const EMPTY_TOUR: TourResponse = {
   ],
 };
 
+function isValidTourResponse(v: unknown): v is TourResponse {
+  if (!v || typeof v !== 'object') return false;
+  const { chapters } = v as Record<string, unknown>;
+  if (!Array.isArray(chapters) || chapters.length === 0) return false;
+  return (chapters as unknown[]).every(
+    ch =>
+      ch !== null &&
+      typeof ch === 'object' &&
+      typeof (ch as Record<string, unknown>).title === 'string' &&
+      typeof (ch as Record<string, unknown>).narrative === 'string' &&
+      Array.isArray((ch as Record<string, unknown>).nodeIds)
+  );
+}
+
 export async function POST(_request: Request): Promise<Response> {
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -25,10 +39,14 @@ export async function POST(_request: Request): Promise<Response> {
     return Response.json({ error: 'Server misconfiguration' }, { status: 500 });
   }
 
-  const { data: nodesData } = await supabase
+  const { data: nodesData, error: dbError } = await supabase
     .from('nodes')
     .select('id, node_type, title, description, status')
     .neq('status', 'archived');
+
+  if (dbError) {
+    return Response.json({ error: 'Failed to load graph data' }, { status: 500 });
+  }
 
   const nodes = (nodesData ?? []) as QuerySerializedNode[];
 
@@ -41,14 +59,19 @@ export async function POST(_request: Request): Promise<Response> {
 
   const anthropic = new Anthropic({ apiKey });
 
-  const message = await anthropic.messages.create({
-    model: process.env.QUERY_LLM_MODEL ?? 'claude-sonnet-4-6',
-    max_tokens: 2048,
-    messages: [{ role: 'user', content: prompt }],
-  });
+  let message: Awaited<ReturnType<typeof anthropic.messages.create>>;
+  try {
+    message = await anthropic.messages.create({
+      model: process.env.QUERY_LLM_MODEL ?? 'claude-sonnet-4-6',
+      max_tokens: 2048,
+      messages: [{ role: 'user', content: prompt }],
+    });
+  } catch {
+    return Response.json({ error: 'Failed to generate tour' }, { status: 500 });
+  }
 
   const textBlock = message.content.find(b => b.type === 'text');
-  if (!textBlock || textBlock.type !== 'text') {
+  if (!textBlock) {
     return Response.json({ error: 'Failed to generate tour' }, { status: 500 });
   }
 
@@ -56,6 +79,9 @@ export async function POST(_request: Request): Promise<Response> {
     const jsonMatch = textBlock.text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('No JSON found');
     const tour = JSON.parse(jsonMatch[0]) as TourResponse;
+    if (!isValidTourResponse(tour)) {
+      return Response.json({ error: 'Failed to parse tour response' }, { status: 500 });
+    }
     return Response.json(tour);
   } catch {
     return Response.json({ error: 'Failed to parse tour response' }, { status: 500 });
