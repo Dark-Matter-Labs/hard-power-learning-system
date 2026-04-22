@@ -13,7 +13,7 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 interface QueryClientProps {
-  readonly nodes: Pick<Node, 'id' | 'node_type' | 'title' | 'description' | 'status'>[];
+  readonly nodes: ReadonlyArray<Pick<Node, 'id' | 'node_type' | 'title' | 'description' | 'status'>>;
 }
 
 export function QueryClient({ nodes }: QueryClientProps) {

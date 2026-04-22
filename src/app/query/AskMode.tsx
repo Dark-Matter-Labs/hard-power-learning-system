@@ -12,7 +12,7 @@ interface Message {
 }
 
 interface AskModeProps {
-  readonly allNodes: Pick<Node, 'id' | 'node_type' | 'title' | 'description' | 'status'>[];
+  readonly allNodes: ReadonlyArray<Pick<Node, 'id' | 'node_type' | 'title' | 'description' | 'status'>>;
 }
 
 export function AskMode({ allNodes }: AskModeProps) {
@@ -37,7 +37,10 @@ export function AskMode({ allNodes }: AskModeProps) {
     const query = input.trim();
     if (!query || isStreaming) return;
 
-    const history = messages.map(m => ({ role: m.role, content: m.content }));
+    const ERROR_MESSAGE = 'Something went wrong. Please try again.';
+    const history = messages
+      .filter(m => m.content !== ERROR_MESSAGE)
+      .map(m => ({ role: m.role, content: m.content }));
     setMessages(prev => [...prev, { id: nextId.current++, role: 'user', content: query, nodeIds: [] }]);
     setInput('');
     setIsStreaming(true);

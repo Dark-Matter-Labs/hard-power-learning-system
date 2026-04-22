@@ -14,7 +14,7 @@ export default async function QueryPage() {
     .neq('status', 'archived');
 
   if (nodesError) {
-    console.error('[QueryPage] Failed to fetch nodes:', nodesError.message);
+    throw new Error('Failed to load graph data');
   }
 
   const nodes = (nodesData ?? []) as Pick<Node, 'id' | 'node_type' | 'title' | 'description' | 'status'>[];

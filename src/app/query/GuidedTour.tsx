@@ -12,7 +12,7 @@ const STATIC_CHAPTER_1: TourChapter = {
 };
 
 interface GuidedTourProps {
-  readonly allNodes: Pick<Node, 'id' | 'node_type' | 'title' | 'description' | 'status'>[];
+  readonly allNodes: ReadonlyArray<Pick<Node, 'id' | 'node_type' | 'title' | 'description' | 'status'>>;
 }
 
 export function GuidedTour({ allNodes }: GuidedTourProps) {
