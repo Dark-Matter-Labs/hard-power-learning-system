@@ -27,9 +27,11 @@ export function serializeNodesForQuery(nodes: QuerySerializedNode[]): string {
     .join('\n');
 }
 
-export function buildQuerySystemPrompt(userBackground?: string): string {
-  if (!userBackground) return BASE_SYSTEM_PROMPT;
-  return `${BASE_SYSTEM_PROMPT} The person asking has a ${userBackground} background — frame your answer accordingly.`;
+export function buildQuerySystemPrompt(userBackground?: string, userName?: string): string {
+  if (!userBackground && !userName) return BASE_SYSTEM_PROMPT;
+  if (!userBackground) return `${BASE_SYSTEM_PROMPT} The user is ${userName}.`;
+  if (!userName) return `${BASE_SYSTEM_PROMPT} The person asking has a ${userBackground} background — frame your answer accordingly.`;
+  return `${BASE_SYSTEM_PROMPT} The user is ${userName}, who has a ${userBackground} background — frame your answer accordingly.`;
 }
 
 export function buildTourPrompt(serializedGraph: string): string {

@@ -51,6 +51,17 @@ describe('buildQuerySystemPrompt', () => {
     const withoutBg = buildQuerySystemPrompt();
     expect(withEmpty).toBe(withoutBg);
   });
+
+  it('includes user name when provided without background', () => {
+    const result = buildQuerySystemPrompt(undefined, 'Malik');
+    expect(result).toContain('Malik');
+  });
+
+  it('includes both name and background when both provided', () => {
+    const result = buildQuerySystemPrompt('finance', 'Malik');
+    expect(result).toContain('Malik');
+    expect(result).toContain('finance');
+  });
 });
 
 describe('buildTourPrompt', () => {

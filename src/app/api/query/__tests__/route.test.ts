@@ -131,6 +131,19 @@ describe('POST /api/query', () => {
     expect(res.status).toBe(200);
   });
 
+  it('includes user name and background in system prompt when profile has both', async () => {
+    mockProfileSelect.mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({
+          data: { name: 'Malik', background: 'finance and investment' },
+          error: null,
+        }),
+      }),
+    });
+    const res = await POST(makeRequest({ query: 'Madrid financial' }));
+    expect(res.status).toBe(200);
+  });
+
   it('errors the stream when Anthropic throws during streaming', async () => {
     const { default: AnthropicSdk } = await import('@anthropic-ai/sdk');
     (AnthropicSdk as ReturnType<typeof vi.fn>).mockImplementationOnce(function () {
