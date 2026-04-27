@@ -65,9 +65,13 @@ export function groupByDate(nodes: ActivityNode[]): RecentActivityGroup[] {
       } else {
         label = dayStart.toLocaleDateString('en-GB', { weekday: 'long', month: 'short', day: 'numeric' });
       }
-      groupMap.set(key, { label, items: [] });
+      const entry = { label, items: [] as ActivityNode[] };
+      groupMap.set(key, entry);
     }
-    groupMap.get(key)!.items.push(node);
+    const entry = groupMap.get(key);
+    if (entry) {
+      entry.items.push(node);
+    }
   }
 
   return Array.from(groupMap.values());
@@ -78,12 +82,12 @@ export function computeDailyCaptures(
   weekStart: Date
 ): boolean[] {
   const days = [false, false, false, false, false];
-  const weekStartUtc = Date.UTC(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
+  const weekStartLocal = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
 
   for (const node of nodes) {
     const date = new Date(node.created_at);
-    const dayStartUtc = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-    const diff = Math.floor((dayStartUtc - weekStartUtc) / (24 * 60 * 60 * 1000));
+    const dayStartLocal = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const diff = Math.floor((dayStartLocal.getTime() - weekStartLocal.getTime()) / (24 * 60 * 60 * 1000));
     if (diff >= 0 && diff <= 4) {
       days[diff] = true;
     }
