@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { NodeType } from '@/lib/types/nodes';
 import type { EdgeType } from '@/lib/types/edges';
+import { UsageTab } from './UsageTab';
 
 export default function SettingsPage() {
   const [nodeTypes, setNodeTypes] = useState<NodeType[]>([]);
@@ -78,6 +79,12 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* LLM Usage */}
+      <div className="mt-8">
+        <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-3">LLM Usage</h2>
+        <UsageTab />
       </div>
     </div></div>
   );
