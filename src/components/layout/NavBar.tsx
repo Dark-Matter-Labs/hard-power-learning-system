@@ -21,11 +21,11 @@ export function NavBar({ reviewCount }: NavBarProps) {
   };
 
   const links = [
-    { href: '/', label: 'Graph' },
-    { href: '/capture', label: 'Capture' },
+    { href: '/', label: 'Dashboard' },
+    { href: '/graph', label: 'Graph' },
     { href: '/commitments', label: 'Commitments' },
     { href: '/query', label: 'Query' },
-    { href: '/review', label: 'Review' },
+    { href: '/review', label: 'Health' },
     { href: '/reflect', label: 'Reflect' },
     { href: '/settings', label: 'Settings' },
   ];

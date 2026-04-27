@@ -18,6 +18,11 @@ vi.mock('@/lib/supabase/client', () => ({
 import { NavBar } from '../NavBar';
 
 describe('NavBar', () => {
+  it('renders Dashboard link', () => {
+    render(<NavBar reviewCount={0} />);
+    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+  });
+
   it('renders Graph link', () => {
     render(<NavBar reviewCount={0} />);
     expect(screen.getByText('Graph')).toBeInTheDocument();
@@ -28,8 +33,8 @@ describe('NavBar', () => {
     expect(screen.getByText('Commitments')).toBeInTheDocument();
   });
 
-  it('renders Review link', () => {
+  it('renders Health link', () => {
     render(<NavBar reviewCount={0} />);
-    expect(screen.getByText('Review')).toBeInTheDocument();
+    expect(screen.getByText('Health')).toBeInTheDocument();
   });
 });
