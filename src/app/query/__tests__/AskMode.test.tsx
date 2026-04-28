@@ -134,3 +134,60 @@ describe('AskMode', () => {
     });
   });
 });
+
+describe('AskMode — save to graph', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('shows "Save to graph" button after assistant message completes', async () => {
+    global.fetch = vi.fn().mockResolvedValue(makeStreamResponse('The answer is 42', ['n1']));
+    render(
+      <AskMode allNodes={[{ id: 'n1', node_type: 'hunch', title: 'Test node', description: null, status: 'promoted' as const }]} />
+    );
+    fireEvent.change(screen.getByPlaceholderText('Ask a question…'), { target: { value: 'What is the key tension?' } });
+    fireEvent.submit(screen.getByPlaceholderText('Ask a question…').closest('form')!);
+    await waitFor(() => expect(screen.getByText('Save to graph')).toBeDefined());
+  });
+
+  it('shows inline form when "Save to graph" is clicked', async () => {
+    global.fetch = vi.fn().mockResolvedValue(makeStreamResponse('The answer is 42', ['n1']));
+    render(
+      <AskMode allNodes={[{ id: 'n1', node_type: 'hunch', title: 'Test node', description: null, status: 'promoted' as const }]} />
+    );
+    fireEvent.change(screen.getByPlaceholderText('Ask a question…'), { target: { value: 'What is the key tension?' } });
+    fireEvent.submit(screen.getByPlaceholderText('Ask a question…').closest('form')!);
+    await waitFor(() => screen.getByText('Save to graph'));
+    fireEvent.click(screen.getByText('Save to graph'));
+    expect(screen.getByPlaceholderText('Node title…')).toBeDefined();
+  });
+
+  it('calls /api/query/save and shows saved indicator on confirm', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(makeStreamResponse('The answer is 42', ['n1']))
+      .mockResolvedValueOnce({
+        ok: true,
+        json: vi.fn().mockResolvedValue({ data: { node: { id: 'saved-id', title: 'Saved node', node_type: 'learning' }, edges_created: 1 } }),
+      });
+    global.fetch = fetchMock;
+    render(
+      <AskMode allNodes={[{ id: 'n1', node_type: 'hunch', title: 'Test node', description: null, status: 'promoted' as const }]} />
+    );
+    fireEvent.change(screen.getByPlaceholderText('Ask a question…'), { target: { value: 'What is the key tension?' } });
+    fireEvent.submit(screen.getByPlaceholderText('Ask a question…').closest('form')!);
+    await waitFor(() => screen.getByText('Save to graph'));
+    fireEvent.click(screen.getByText('Save to graph'));
+    await waitFor(() => screen.getByPlaceholderText('Node title…'));
+    fireEvent.click(screen.getByText('Save'));
+    await waitFor(() => expect(screen.queryByText('Save to graph')).toBeNull());
+
+    const [, saveCall] = fetchMock.mock.calls;
+    const body = JSON.parse(saveCall[1].body as string) as { node_type: string; context_node_ids: string[] };
+    expect(body.node_type).toBe('learning');
+    expect(body.context_node_ids).toContain('n1');
+  });
+});

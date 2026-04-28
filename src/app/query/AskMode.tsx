@@ -9,10 +9,20 @@ interface Message {
   readonly role: 'user' | 'assistant';
   readonly content: string;
   readonly nodeIds: readonly string[];
+  readonly savedNodeId?: string;
 }
 
 interface AskModeProps {
   readonly allNodes: ReadonlyArray<Pick<Node, 'id' | 'node_type' | 'title' | 'description' | 'status'>>;
+}
+
+type SaveNodeType = 'hunch' | 'learning';
+
+interface SaveState {
+  readonly messageId: number;
+  readonly title: string;
+  readonly nodeType: SaveNodeType;
+  readonly saving: boolean;
 }
 
 export function AskMode({ allNodes }: AskModeProps) {
@@ -21,6 +31,7 @@ export function AskMode({ allNodes }: AskModeProps) {
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
+  const [saveState, setSaveState] = useState<SaveState | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const referencedNodeIds = useMemo(
@@ -99,7 +110,37 @@ export function AskMode({ allNodes }: AskModeProps) {
     }
   }
 
-  // Group nodes by type
+  function openSaveForm(message: Message) {
+    const firstLine = message.content.split('\n')[0].trim().slice(0, 150);
+    setSaveState({ messageId: message.id, title: firstLine, nodeType: 'learning', saving: false });
+  }
+
+  async function handleSave(message: Message) {
+    if (!saveState) return;
+    setSaveState(s => s ? { ...s, saving: true } : null);
+
+    try {
+      const res = await fetch('/api/query/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: saveState.title,
+          content: message.content,
+          node_type: saveState.nodeType,
+          context_node_ids: [...message.nodeIds],
+        }),
+      });
+      if (!res.ok) throw new Error('Save failed');
+      const { data } = await res.json() as { data: { node: { id: string } } };
+      setMessages(prev => prev.map(m =>
+        m.id === message.id ? { ...m, savedNodeId: data.node.id } : m
+      ));
+      setSaveState(null);
+    } catch {
+      setSaveState(s => s ? { ...s, saving: false } : null);
+    }
+  }
+
   const nodesByType = useMemo(
     () => referencedNodes.reduce<Record<string, typeof referencedNodes>>((acc, n) => {
       const key = n.node_type.replace(/_/g, ' ');
@@ -113,21 +154,81 @@ export function AskMode({ allNodes }: AskModeProps) {
       <div className="flex-1 flex flex-col min-w-0">
         <div className="flex-1 overflow-y-auto space-y-4 pb-4">
           {messages.length === 0 && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 pt-8 text-center">
+            <p className="text-sm text-cof-text-tertiary pt-8 text-center">
               Ask anything about the knowledge graph
             </p>
           )}
           {messages.map((msg) => (
             <div key={msg.id} className={msg.role === 'user' ? 'flex justify-end' : ''}>
               {msg.role === 'user' ? (
-                <div className="max-w-sm bg-node-hunch/10 border border-node-hunch/20 rounded-xl px-4 py-2 text-sm text-gray-800 dark:text-gray-200">
+                <div className="max-w-sm bg-node-hunch/10 border border-node-hunch/20 rounded-xl px-4 py-2 text-sm text-cof-text-primary">
                   {msg.content}
                 </div>
               ) : (
-                <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-                  {msg.content}
-                  {isStreaming && msg.id === messages[messages.length - 1]?.id && (
-                    <span className="animate-pulse">▋</span>
+                <div>
+                  <div className="text-sm text-cof-text-secondary leading-relaxed whitespace-pre-wrap">
+                    {msg.content}
+                    {isStreaming && msg.id === messages[messages.length - 1]?.id && (
+                      <span className="animate-pulse">▋</span>
+                    )}
+                  </div>
+
+                  {msg.content && !isStreaming && (
+                    <div className="mt-2">
+                      {msg.savedNodeId ? (
+                        <a
+                          href={`/capture/${msg.savedNodeId}`}
+                          className="text-xs text-node-hunch hover:underline"
+                        >
+                          Saved to graph →
+                        </a>
+                      ) : saveState?.messageId === msg.id ? (
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <input
+                            type="text"
+                            value={saveState.title}
+                            onChange={e => setSaveState(s => s ? { ...s, title: e.target.value } : null)}
+                            placeholder="Node title…"
+                            className="text-xs bg-cof-bg-elevated border border-cof-border rounded px-2 py-1 text-cof-text-primary w-56 focus:outline-none focus:border-node-hunch"
+                          />
+                          <div className="flex gap-1">
+                            {(['learning', 'hunch'] as const).map(t => (
+                              <button
+                                key={t}
+                                type="button"
+                                onClick={() => setSaveState(s => s ? { ...s, nodeType: t } : null)}
+                                className={`text-xs px-2 py-1 rounded border transition-colors ${saveState.nodeType === t ? 'border-node-hunch bg-node-hunch/10 text-node-hunch' : 'border-cof-border text-cof-text-tertiary'}`}
+                              >
+                                {t}
+                              </button>
+                            ))}
+                          </div>
+                          <button
+                            type="button"
+                            disabled={!saveState.title.trim() || saveState.saving}
+                            onClick={() => handleSave(msg)}
+                            className="text-xs px-3 py-1 bg-node-hunch text-white rounded disabled:opacity-50 hover:opacity-90 transition-opacity"
+                          >
+                            {saveState.saving ? 'Saving…' : 'Save'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSaveState(null)}
+                            className="text-xs text-cof-text-tertiary hover:text-cof-text-secondary"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => openSaveForm(msg)}
+                          className="text-xs text-cof-text-tertiary hover:text-node-hunch transition-colors mt-1"
+                        >
+                          Save to graph
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               )}
@@ -136,14 +237,14 @@ export function AskMode({ allNodes }: AskModeProps) {
           <div ref={bottomRef} />
         </div>
 
-        <form onSubmit={handleSubmit} className="flex gap-2 pt-3 border-t border-gray-200 dark:border-gray-800">
+        <form onSubmit={handleSubmit} className="flex gap-2 pt-3 border-t border-cof-border">
           <input
             type="text"
             value={input}
             onChange={e => setInput(e.target.value)}
             placeholder="Ask a question…"
             disabled={isStreaming}
-            className="flex-1 text-sm px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-indigo-400 disabled:opacity-50"
+            className="flex-1 text-sm px-3 py-2 bg-cof-bg-elevated border border-cof-border rounded-lg focus:outline-none focus:border-node-hunch disabled:opacity-50"
           />
           <button
             type="submit"
@@ -158,13 +259,13 @@ export function AskMode({ allNodes }: AskModeProps) {
       {referencedNodes.length > 0 && panelOpen && (
         <div className="w-56 flex-shrink-0 overflow-y-auto">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+            <p className="text-xs font-medium text-cof-text-tertiary uppercase tracking-wide">
               Referenced nodes
             </p>
             <button
               type="button"
               onClick={() => setPanelOpen(false)}
-              className="text-xs text-gray-400 hover:text-gray-600"
+              className="text-xs text-cof-text-tertiary hover:text-cof-text-secondary"
             >
               ›
             </button>
@@ -172,7 +273,7 @@ export function AskMode({ allNodes }: AskModeProps) {
           <div className="space-y-2">
             {Object.entries(nodesByType).map(([type, nodes]) => (
               <div key={type}>
-                <p className="text-[10px] uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1">{type}</p>
+                <p className="text-[10px] uppercase tracking-wide text-cof-text-tertiary mb-1">{type}</p>
                 <div className="space-y-1">
                   {nodes.map(n => <NodeCard key={n.id} node={n} />)}
                 </div>
@@ -186,7 +287,7 @@ export function AskMode({ allNodes }: AskModeProps) {
           type="button"
           onClick={() => setPanelOpen(true)}
           aria-label="Show referenced nodes"
-          className="w-8 flex-shrink-0 flex items-center justify-center text-gray-400 hover:text-gray-600 border-l border-gray-200 dark:border-gray-800"
+          className="w-8 flex-shrink-0 flex items-center justify-center text-cof-text-tertiary hover:text-cof-text-secondary border-l border-cof-border"
         >
           ‹
         </button>
