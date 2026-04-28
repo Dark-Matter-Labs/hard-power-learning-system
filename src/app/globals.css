@@ -39,7 +39,7 @@
   /* Fonts */
   --font-display: 'Geist', 'Inter', system-ui, sans-serif;
   --font-sans: 'Geist', 'Inter', system-ui, sans-serif;
-  --font-serif: 'Source Serif 4', Georgia, serif;
+  --font-serif: var(--font-source-serif), Georgia, serif;
   --font-mono: 'Geist Mono', 'JetBrains Mono', monospace;
 
   /* Semantic colors — picked up by Tailwind as bg-cof-bg, text-cof-text-primary, etc. */

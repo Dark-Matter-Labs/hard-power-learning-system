@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono, Source_Serif_4 } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/components/layout/AuthProvider';
 import { NavBar } from '@/components/layout/NavBar';
@@ -13,6 +13,12 @@ const inter = Inter({
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-jetbrains-mono',
+});
+
+const sourceSerif4 = Source_Serif_4({
+  subsets: ['latin'],
+  variable: '--font-source-serif',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -47,7 +53,10 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100`}>
+      <body
+        className={`${inter.variable} ${jetbrainsMono.variable} ${sourceSerif4.variable} font-sans antialiased`}
+        style={{ background: 'var(--color-bg)', color: 'var(--color-text-primary)' }}
+      >
         <AuthProvider initialUser={user}>
           {user && <NavBar reviewCount={reviewCount} />}
           <main className="h-screen overflow-y-auto pt-[49px]">
