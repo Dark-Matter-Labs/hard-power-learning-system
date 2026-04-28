@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { QuickCaptureForm } from '../QuickCaptureForm';
 
 // Mock PersonAutocomplete to avoid fetch calls in tests
@@ -25,13 +25,15 @@ describe('QuickCaptureForm', () => {
     expect(submitButton).not.toBeDisabled();
   });
 
-  it('calls onSubmit with form data', () => {
-    const onSubmit = vi.fn();
+  it('calls onSubmit with form data', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
     render(<QuickCaptureForm onSubmit={onSubmit} />);
 
     fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'Test thought' } });
     fireEvent.change(screen.getByLabelText(/description/i), { target: { value: 'A test description' } });
-    fireEvent.click(screen.getByRole('button', { name: /^capture$/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /^capture$/i }));
+    });
 
     expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
       title: 'Test thought',
@@ -39,23 +41,27 @@ describe('QuickCaptureForm', () => {
     }));
   });
 
-  it('does not include node_type in submitted form data', () => {
-    const onSubmit = vi.fn();
+  it('does not include node_type in submitted form data', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
     render(<QuickCaptureForm onSubmit={onSubmit} />);
 
     fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'Test thought' } });
-    fireEvent.click(screen.getByRole('button', { name: /^capture$/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /^capture$/i }));
+    });
 
     const submitted = onSubmit.mock.calls[0][0];
     expect(submitted).not.toHaveProperty('node_type');
   });
 
-  it('does not include confidence_level in submitted form data', () => {
-    const onSubmit = vi.fn();
+  it('does not include confidence_level in submitted form data', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
     render(<QuickCaptureForm onSubmit={onSubmit} />);
 
     fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'Test thought' } });
-    fireEvent.click(screen.getByRole('button', { name: /^capture$/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /^capture$/i }));
+    });
 
     const submitted = onSubmit.mock.calls[0][0];
     expect(submitted).not.toHaveProperty('confidence_level');
@@ -104,14 +110,23 @@ describe('QuickCaptureForm', () => {
     expect(textarea).toHaveAttribute('placeholder', 'Paste the transcript or meeting notes here...');
   });
 
-  it('resets form after submit', () => {
-    const onSubmit = vi.fn();
+  it('resets form after submit', async () => {
+    vi.useFakeTimers();
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
     render(<QuickCaptureForm onSubmit={onSubmit} />);
 
     const titleInput = screen.getByLabelText(/title/i);
     fireEvent.change(titleInput, { target: { value: 'Test thought' } });
-    fireEvent.click(screen.getByRole('button', { name: /^capture$/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /^capture$/i }));
+    });
+
+    // Form resets after the 1000ms captured → idle transition
+    await act(async () => {
+      vi.advanceTimersByTime(1000);
+    });
 
     expect(titleInput).toHaveValue('');
+    vi.useRealTimers();
   });
 });

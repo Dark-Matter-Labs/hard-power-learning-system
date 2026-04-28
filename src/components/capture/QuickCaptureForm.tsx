@@ -17,6 +17,8 @@ export interface CaptureFormData {
 
 export type EntryMode = 'thought' | 'call' | 'file' | null;
 
+type SubmitPhase = 'idle' | 'capturing' | 'captured';
+
 interface QuickCaptureFormProps {
   readonly onSubmit: (data: CaptureFormData) => Promise<void> | void;
   readonly isSubmitting?: boolean;
@@ -33,11 +35,13 @@ export function QuickCaptureForm({ onSubmit, isSubmitting = false, entryMode = n
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [submitPhase, setSubmitPhase] = useState<SubmitPhase>('idle');
 
   const isFileMode = entryMode === 'file';
+  const isBusy = submitPhase !== 'idle' || isSubmitting;
   const canSubmit = isFileMode
-    ? selectedFile !== null && !isUploading && !isSubmitting
-    : title.trim().length > 0 && !isSubmitting;
+    ? selectedFile !== null && !isUploading && !isBusy
+    : title.trim().length > 0 && !isBusy;
 
   const descriptionRows = entryMode === 'call' ? 10 : 5;
   const descriptionPlaceholder = entryMode === 'call'
@@ -87,25 +91,32 @@ export function QuickCaptureForm({ onSubmit, isSubmitting = false, entryMode = n
       return;
     }
 
-    onSubmit({
-      title: title.trim(),
-      description: description.trim(),
-      date: date || undefined,
-      participant_ids: selectedPeople.length > 0 ? selectedPeople.map(p => p.id) : undefined,
-      ...(linkUrl.trim() ? { external_link_url: linkUrl.trim(), external_link_label: linkLabel.trim() || linkUrl.trim() } : {}),
-    });
+    setSubmitPhase('capturing');
+    try {
+      await onSubmit({
+        title: title.trim(),
+        description: description.trim(),
+        date: date || undefined,
+        participant_ids: selectedPeople.length > 0 ? selectedPeople.map(p => p.id) : undefined,
+        ...(linkUrl.trim() ? { external_link_url: linkUrl.trim(), external_link_label: linkLabel.trim() || linkUrl.trim() } : {}),
+      });
 
-    setTitle('');
-    setDescription('');
-    setDate(new Date().toISOString().slice(0, 10));
-    setSelectedPeople([]);
-    setLinkUrl('');
-    setLinkLabel('');
+      setSubmitPhase('captured');
+      setTimeout(() => {
+        setSubmitPhase('idle');
+        setTitle('');
+        setDescription('');
+        setDate(new Date().toISOString().slice(0, 10));
+        setSelectedPeople([]);
+        setLinkUrl('');
+        setLinkLabel('');
+      }, 1000);
+    } catch {
+      setSubmitPhase('idle');
+    }
   };
 
-  const submitLabel = isFileMode
-    ? (isUploading ? 'Uploading…' : isSubmitting ? 'Capturing…' : 'Upload & capture')
-    : (isSubmitting ? 'Capturing...' : 'Capture');
+  const fileModeSubmitLabel = isUploading ? 'Uploading…' : isSubmitting ? 'Capturing…' : 'Upload & capture';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -195,13 +206,37 @@ export function QuickCaptureForm({ onSubmit, isSubmitting = false, entryMode = n
         </details>
       )}
 
-      <button
-        type="submit"
-        disabled={!canSubmit}
-        className="w-full bg-node-assumption-bg text-white rounded-lg px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        {submitLabel}
-      </button>
+      {isFileMode ? (
+        <button
+          type="submit"
+          disabled={!canSubmit}
+          className="w-full bg-node-assumption-bg text-white rounded-lg px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {fileModeSubmitLabel}
+        </button>
+      ) : (
+        <button
+          type="submit"
+          disabled={!canSubmit || submitPhase !== 'idle'}
+          className={`
+            px-4 py-2 text-sm rounded-lg font-medium transition-all duration-200
+            ${submitPhase === 'captured'
+              ? 'bg-node-assumption-bg text-white'
+              : 'bg-node-hunch text-white hover:opacity-90'
+            }
+            disabled:opacity-70
+          `}
+        >
+          {submitPhase === 'idle' && 'Capture'}
+          {submitPhase === 'capturing' && (
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-white/70 animate-pulse" />
+              Capturing…
+            </span>
+          )}
+          {submitPhase === 'captured' && '✓ Captured'}
+        </button>
+      )}
     </form>
   );
 }
