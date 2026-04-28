@@ -33,6 +33,7 @@ export async function POST(request: Request) {
       { data: goalSpacesData },
       { data: triggerOutcomesData },
       { data: personNodesData },
+      { data: existingNodesData },
     ] = await Promise.all([
       supabase
         .from('nodes')
@@ -54,6 +55,13 @@ export async function POST(request: Request) {
         .select('id, title')
         .eq('node_type', 'person')
         .in('status', ['promoted', 'human_reviewed']),
+      supabase
+        .from('nodes')
+        .select('id, title, node_type')
+        .in('status', ['promoted', 'human_reviewed'])
+        .neq('id', node_id)
+        .order('updated_at', { ascending: false })
+        .limit(60),
     ]);
 
     if (fetchError || !node) {
@@ -64,6 +72,7 @@ export async function POST(request: Request) {
       goalSpaces: goalSpacesData ?? [],
       triggerOutcomes: triggerOutcomesData ?? [],
       personNodes: personNodesData ?? [],
+      existingNodes: (existingNodesData ?? []) as Array<{ id: string; title: string; node_type: string }>,
     };
 
     const captureConfig = getCaptureType(node.node_type as Parameters<typeof getCaptureType>[0]);
@@ -189,6 +198,14 @@ export async function POST(request: Request) {
           },
         })
         .eq('id', node_id);
+
+      const { resolveConnections } = await import('@/lib/agents/connectionResolver');
+      await resolveConnections(
+        node_id,
+        extraction.suggested_connections,
+        supabase,
+        user.id,
+      );
 
       // Log activity
       await supabase.from('activity_log').insert({
