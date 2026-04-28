@@ -2,21 +2,62 @@
 
 :root {
   --nav-height: 49px;
-  --background: #ffffff;
-  --foreground: #171717;
+
+  /* Semantic backgrounds */
+  --color-bg: #FAFAF7;
+  --color-bg-elevated: #FFFFFF;
+  --color-bg-subtle: #F4F3EF;
+
+  /* Semantic text */
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #555555;
+  --color-text-tertiary: #999999;
+
+  /* Borders */
+  --color-border: #E8E6E1;
+  --color-border-strong: #D4D2CD;
+
+  /* Legacy vars kept for compatibility */
+  --background: #FAFAF7;
+  --foreground: #1A1A1A;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --color-bg: #0F0F0D;
+  --color-bg-elevated: #1A1A18;
+  --color-bg-subtle: #141412;
+  --color-text-primary: #F0EFE9;
+  --color-text-secondary: #A8A6A0;
+  --color-text-tertiary: #666462;
+  --color-border: #2A2A27;
+  --color-border-strong: #3A3A37;
+  --background: #0F0F0D;
+  --foreground: #F0EFE9;
 }
 
 @theme inline {
+  /* Fonts */
+  --font-display: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-sans: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-serif: 'Source Serif 4', Georgia, serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', monospace;
+
+  /* Semantic colors — picked up by Tailwind as bg-cof-bg, text-cof-text-primary, etc. */
+  --color-cof-bg: var(--color-bg);
+  --color-cof-bg-elevated: var(--color-bg-elevated);
+  --color-cof-bg-subtle: var(--color-bg-subtle);
+  --color-cof-text-primary: var(--color-text-primary);
+  --color-cof-text-secondary: var(--color-text-secondary);
+  --color-cof-text-tertiary: var(--color-text-tertiary);
+  --color-cof-border: var(--color-border);
+  --color-cof-border-strong: var(--color-border-strong);
+
+  /* Background / foreground for body */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  /* Node-type colours */
+
+  /* Node-type accent colors — unchanged */
   --color-node-hunch: #7F77DD;
-  /* assumption node has two colours: bg = promoted/background state, fg = active/foreground state */
   --color-node-assumption-bg: #1D9E75;
   --color-node-assumption-fg: #D85A30;
   --color-node-test: #D4537E;
@@ -26,22 +67,18 @@
   --color-node-site: #639922;
   --color-node-commitment: #185FA5;
 
-  /* COF earth-tone palette (groundwork for Martin's design) */
+  /* Earth palette */
   --color-cof-earth: #8B7355;
   --color-cof-ocean: #2D6A7F;
   --color-cof-atmosphere: #6B8AA3;
   --color-cof-canopy: #5A7247;
-
-  /* Font stacks — swap with Martin's fonts when delivered */
-  --font-display: 'Inter', system-ui, sans-serif;
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Scrollbar styling */
@@ -71,4 +108,36 @@ body {
 .page-with-nav {
   padding-top: var(--nav-height);
   min-height: 100vh;
+}
+
+/* Card hover lift */
+@keyframes card-lift {
+  from { transform: translateY(0); box-shadow: none; }
+  to   { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+}
+
+/* Tension alert pulse — 3 cycles then stops */
+@keyframes tension-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Shared card hover — apply with .card-hover */
+.card-hover {
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+}
+.card-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+.dark .card-hover:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
