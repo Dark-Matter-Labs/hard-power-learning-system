@@ -90,6 +90,26 @@ describe('runDistillation', () => {
     expect(result.errors.length).toBeGreaterThan(0);
   });
 
+  it('returns error when node fetch fails', async () => {
+    const supabase = {
+      from: () => ({
+        select: () => ({
+          in: () => ({
+            eq: () => ({
+              order: () => ({
+                limit: () => Promise.resolve({ data: null, error: { message: 'DB connection failed' } }),
+              }),
+            }),
+          }),
+        }),
+      }),
+      _candidatesInsert: vi.fn(),
+    };
+    const result = await runDistillation(supabase as never, 'user-1');
+    expect(result.created).toBe(0);
+    expect(result.errors[0]).toContain('Failed to fetch nodes');
+  });
+
   it('records error and continues when synthesis fails for one group', async () => {
     const supabase = makeSupabase(NODES);
     mockCallLLM

@@ -11,7 +11,7 @@ interface NodeSummary {
 
 const clusterSchema = z.object({
   groups: z.array(z.object({
-    node_ids: z.array(z.string()).min(2).max(10),
+    node_ids: z.array(z.string()).min(2).max(5),
     rationale: z.string().min(1),
   })).optional(),
 });
@@ -27,7 +27,7 @@ export async function runDistillation(
   supabase: SupabaseClient,
   userId: string,
 ): Promise<{ created: number; errors: string[] }> {
-  const { data: nodes } = await supabase
+  const { data: nodes, error: nodesError } = await supabase
     .from('nodes')
     .select('id, title, node_type, description')
     .in('status', ['promoted', 'human_reviewed'])
@@ -35,6 +35,7 @@ export async function runDistillation(
     .order('updated_at', { ascending: false })
     .limit(100);
 
+  if (nodesError) return { created: 0, errors: [`Failed to fetch nodes: ${nodesError.message}`] };
   if (!nodes?.length) return { created: 0, errors: [] };
 
   const nodeList = (nodes as NodeSummary[])
@@ -60,12 +61,14 @@ export async function runDistillation(
   const errors: string[] = [];
   let created = 0;
   const validIdSet = new Set((nodes as NodeSummary[]).map(n => n.id));
+  const nodeMap = new Map((nodes as NodeSummary[]).map(n => [n.id, n]));
 
   for (const group of groups) {
-    const groupNodes = group.node_ids
-      .filter(id => validIdSet.has(id))
-      .map(id => (nodes as NodeSummary[]).find(n => n.id === id)!)
-      .filter(Boolean);
+    const groupNodes = group.node_ids.reduce<NodeSummary[]>((acc, id) => {
+      const node = nodeMap.get(id);
+      if (node) acc.push(node);
+      return acc;
+    }, []);
 
     if (groupNodes.length < 2) continue;
 
