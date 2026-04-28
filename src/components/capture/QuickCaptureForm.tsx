@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, useRef, useEffect, type FormEvent } from 'react';
 import { PersonAutocomplete, type PersonOption } from './PersonAutocomplete';
 import { FileCaptureMode } from './FileCaptureMode';
 import type { Attachment } from '@/lib/types/nodes';
@@ -37,6 +37,8 @@ export function QuickCaptureForm({ onSubmit, isSubmitting = false, entryMode = n
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [submitPhase, setSubmitPhase] = useState<SubmitPhase>('idle');
 
+  const submitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const isFileMode = entryMode === 'file';
   const isBusy = submitPhase !== 'idle' || isSubmitting;
   const canSubmit = isFileMode
@@ -52,6 +54,12 @@ export function QuickCaptureForm({ onSubmit, isSubmitting = false, entryMode = n
     setSelectedFile(file);
     setUploadError(null);
   };
+
+  useEffect(() => {
+    return () => {
+      if (submitTimerRef.current) clearTimeout(submitTimerRef.current);
+    };
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -102,7 +110,8 @@ export function QuickCaptureForm({ onSubmit, isSubmitting = false, entryMode = n
       });
 
       setSubmitPhase('captured');
-      setTimeout(() => {
+      if (submitTimerRef.current) clearTimeout(submitTimerRef.current);
+      submitTimerRef.current = setTimeout(() => {
         setSubmitPhase('idle');
         setTitle('');
         setDescription('');
