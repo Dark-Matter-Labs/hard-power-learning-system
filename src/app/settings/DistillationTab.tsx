@@ -25,6 +25,7 @@ export function DistillationTab() {
   const [running, setRunning] = useState(false);
   const [runResult, setRunResult] = useState<{ created: number; errors: string[] } | null>(null);
   const [acting, setActing] = useState<string | null>(null);
+  const [actError, setActError] = useState<string | null>(null);
 
   const loadCandidates = useCallback(() => {
     setLoading(true);
@@ -51,6 +52,7 @@ export function DistillationTab() {
   };
 
   const act = (candidateId: string, action: 'accept' | 'reject') => {
+    setActError(null);
     setActing(candidateId);
     fetch('/api/distill/candidates', {
       method: 'PATCH',
@@ -58,7 +60,7 @@ export function DistillationTab() {
       body: JSON.stringify({ id: candidateId, action }),
     })
       .then(r => { if (!r.ok) throw new Error('Action failed'); return loadCandidates(); })
-      .catch(() => {})
+      .catch(() => setActError('Action failed — please try again'))
       .finally(() => setActing(null));
   };
 
@@ -89,9 +91,13 @@ export function DistillationTab() {
             ? `${runResult.created} merge candidate${runResult.created === 1 ? '' : 's'} found`
             : 'No near-duplicates found'}
           {runResult.errors.length > 0 && (
-            <p className="text-red-500 mt-1">{runResult.errors[0]}</p>
+            <p className="text-red-500 mt-1">{runResult.errors.join(' · ')}</p>
           )}
         </div>
+      )}
+
+      {actError && (
+        <p className="text-xs text-red-500">{actError}</p>
       )}
 
       {candidates.length === 0 ? (
