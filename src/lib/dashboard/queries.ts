@@ -6,12 +6,21 @@ export interface FocusItem {
   readonly id: string;
 }
 
+export interface HunchStageCounts {
+  readonly hypothesis: number;
+  readonly uncertainty: number;
+  readonly navigation: number;
+  readonly coherence: number;
+  readonly holding: number;
+}
+
 export interface SystemPulseData {
   readonly lastCaptureAt: string | null;
   readonly thisWeekCount: number;
   readonly activeCommitmentsCount: number;
   readonly openTensionsCount: number;
   readonly hunchesInFlightCount: number;
+  readonly hunchStageCounts: HunchStageCounts;
 }
 
 export interface TrajectoryItem {

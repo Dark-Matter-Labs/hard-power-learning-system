@@ -12,7 +12,7 @@ import {
   getWeekStart,
   getTodayIndex,
 } from '@/lib/dashboard/queries';
-import type { FocusItem, SystemPulseData, RhythmData, ActivityNode } from '@/lib/dashboard/queries';
+import type { FocusItem, SystemPulseData, HunchStageCounts, RhythmData, ActivityNode } from '@/lib/dashboard/queries';
 
 function greeting(name: string | null): string {
   const h = new Date().getHours();
@@ -56,6 +56,7 @@ export default async function DashboardPage() {
     commitmentCountRes,
     tensionCountRes,
     hunchCountRes,
+    hunchStagesRes,
   ] = await Promise.all([
     supabase.from('profiles').select('name').eq('id', user.id).single(),
     supabase.from('tension_alerts' as string).select('id, title').eq('status', 'active').limit(4),
@@ -83,6 +84,9 @@ export default async function DashboardPage() {
     supabase.from('nodes').select('id', { count: 'exact', head: true })
       .eq('node_type', 'hunch').neq('status', 'archived').neq('status', 'falsified')
       .neq('status', 'suspended').neq('status', 'promoted'),
+    supabase.from('nodes').select('lifecycle_stage')
+      .eq('node_type', 'hunch').neq('status', 'archived').neq('status', 'falsified')
+      .neq('status', 'suspended').neq('status', 'promoted'),
   ]);
 
   const focusItems: FocusItem[] = [];
@@ -97,12 +101,20 @@ export default async function DashboardPage() {
     focusItems.push({ id: 'unprocessed', type: 'unprocessed_captures', title: `${unprocessedCount} capture${unprocessedCount === 1 ? '' : 's'} need processing`, subtitle: 'from the past 7 days', href: '/review' });
   }
 
+  const stageCountsMutable = { hypothesis: 0, uncertainty: 0, navigation: 0, coherence: 0, holding: 0 };
+  for (const row of (hunchStagesRes.data ?? [])) {
+    const s = row.lifecycle_stage as string;
+    if (s in stageCountsMutable) stageCountsMutable[s as keyof typeof stageCountsMutable]++;
+  }
+  const stageCounts: HunchStageCounts = stageCountsMutable;
+
   const pulse: SystemPulseData = {
     lastCaptureAt: (lastCaptureRes.data ?? [])[0]?.created_at ?? null,
     thisWeekCount: weekCountRes.count ?? 0,
     activeCommitmentsCount: commitmentCountRes.count ?? 0,
     openTensionsCount: tensionCountRes.count ?? 0,
     hunchesInFlightCount: hunchCountRes.count ?? 0,
+    hunchStageCounts: stageCounts,
   };
 
   const goalSpaces = (allGoalSpacesRes.data ?? []) as { id: string; title: string }[];

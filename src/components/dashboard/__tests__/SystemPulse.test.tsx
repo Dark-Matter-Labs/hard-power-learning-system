@@ -10,6 +10,7 @@ describe('SystemPulse', () => {
     activeCommitmentsCount: 4,
     openTensionsCount: 2,
     hunchesInFlightCount: 18,
+    hunchStageCounts: { hypothesis: 0, uncertainty: 0, navigation: 0, coherence: 0, holding: 0 },
   };
 
   it('renders all five metric values', () => {

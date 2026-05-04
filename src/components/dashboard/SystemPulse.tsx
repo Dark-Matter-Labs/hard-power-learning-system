@@ -46,10 +46,18 @@ export function SystemPulse({ data }: { readonly data: SystemPulseData }) {
         </div>
         <div className="flex justify-between text-sm">
           <dt className="text-cof-text-secondary">Hunches in flight</dt>
-          <dd>
+          <dd className="text-right">
             <Link href="/graph" className="font-medium text-cof-text-primary hover:text-node-hunch transition-colors">
               {data.hunchesInFlightCount}
             </Link>
+            {data.hunchesInFlightCount > 0 && (
+              <div className="text-[10px] text-cof-text-tertiary mt-0.5">
+                {(['hypothesis', 'uncertainty', 'navigation', 'coherence', 'holding'] as const)
+                  .filter(s => data.hunchStageCounts[s] > 0)
+                  .map(s => `${data.hunchStageCounts[s]} ${s}`)
+                  .join(' · ')}
+              </div>
+            )}
           </dd>
         </div>
       </dl>
