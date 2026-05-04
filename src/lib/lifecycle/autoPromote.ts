@@ -1,4 +1,10 @@
-export type LifecycleStage = 'divergence' | 'attractor' | 'convergence' | 'execution' | 'archived';
+export type LifecycleStage =
+  | 'hypothesis'
+  | 'uncertainty'
+  | 'navigation'
+  | 'coherence'
+  | 'holding'
+  | 'archived';
 
 export interface HunchStats {
   readonly currentStage: LifecycleStage;
@@ -8,6 +14,8 @@ export interface HunchStats {
   readonly linkedCommitments: number;
   readonly activeCommitments: number;
   readonly testsWithSignals: number;
+  readonly daysInCurrentStage: number;
+  readonly linkedLearnings: number;
 }
 
 export interface StageDecision {
@@ -17,26 +25,41 @@ export interface StageDecision {
 }
 
 export function evaluateStagePromotion(stats: HunchStats): StageDecision {
-  const { currentStage, connectedAssumptions, connectedTests, reinforcedEdges, linkedCommitments, activeCommitments, testsWithSignals } = stats;
+  const {
+    currentStage,
+    connectedAssumptions,
+    connectedTests,
+    reinforcedEdges,
+    activeCommitments,
+    testsWithSignals,
+    daysInCurrentStage,
+    linkedLearnings,
+  } = stats;
 
-  if (currentStage === 'divergence') {
+  if (currentStage === 'hypothesis') {
     if (connectedAssumptions >= 2) {
-      return { advance: true, newStage: 'attractor', reason: `${connectedAssumptions} assumptions connected` };
+      return { advance: true, newStage: 'uncertainty', reason: `${connectedAssumptions} assumptions connected` };
     }
     if (connectedTests >= 1) {
-      return { advance: true, newStage: 'attractor', reason: `${connectedTests} test(s) linked` };
+      return { advance: true, newStage: 'uncertainty', reason: `${connectedTests} test(s) linked` };
     }
   }
 
-  if (currentStage === 'attractor') {
-    if (reinforcedEdges >= 2 && linkedCommitments >= 1) {
-      return { advance: true, newStage: 'convergence', reason: `${reinforcedEdges} reinforced edges, ${linkedCommitments} commitment(s)` };
+  if (currentStage === 'uncertainty') {
+    if (connectedTests >= 1 && testsWithSignals >= 1) {
+      return { advance: true, newStage: 'navigation', reason: `Active inquiry: ${connectedTests} test(s) with ${testsWithSignals} signal(s)` };
     }
   }
 
-  if (currentStage === 'convergence') {
-    if (activeCommitments >= 1 && testsWithSignals >= 1) {
-      return { advance: true, newStage: 'execution', reason: `Active commitment + ${testsWithSignals} test(s) with signals` };
+  if (currentStage === 'navigation') {
+    if (reinforcedEdges >= 2 && activeCommitments >= 1) {
+      return { advance: true, newStage: 'coherence', reason: `${reinforcedEdges} reinforced edges, active commitment` };
+    }
+  }
+
+  if (currentStage === 'coherence') {
+    if (daysInCurrentStage >= 30 && linkedLearnings >= 2) {
+      return { advance: true, newStage: 'holding', reason: `${daysInCurrentStage} days in coherence with ${linkedLearnings} learnings` };
     }
   }
 
@@ -50,13 +73,14 @@ export async function checkHunchPromotion(nodeId: string): Promise<StageDecision
 
     const { data: node } = await supabase
       .from('nodes')
-      .select('lifecycle_stage, node_type')
+      .select('lifecycle_stage, node_type, stage_transitioned_at, created_at')
       .eq('id', nodeId)
       .single();
 
     if (!node || node.node_type !== 'hunch') return { advance: false };
 
     const { data: edgesFromHunch } = await supabase.from('edges').select('target_id').eq('source_id', nodeId);
+    const { data: edgesToHunch } = await supabase.from('edges').select('source_id').eq('target_id', nodeId);
 
     let connectedAssumptions = 0;
     let connectedTests = 0;
@@ -101,9 +125,28 @@ export async function checkHunchPromotion(nodeId: string): Promise<StageDecision
       }
     }
 
-    const VALID_STAGES: readonly LifecycleStage[] = ['divergence', 'attractor', 'convergence', 'execution', 'archived'];
+    const allConnectedIds = [
+      ...(edgesFromHunch ?? []).map(e => e.target_id as string),
+      ...(edgesToHunch ?? []).map(e => e.source_id as string),
+    ];
+    let linkedLearnings = 0;
+    if (allConnectedIds.length > 0) {
+      const { count: lCount } = await supabase.from('nodes')
+        .select('id', { count: 'exact', head: true })
+        .in('id', allConnectedIds).eq('node_type', 'learning');
+      linkedLearnings = lCount ?? 0;
+    }
+
+    const transitionedAt = node.stage_transitioned_at
+      ? new Date(node.stage_transitioned_at as string)
+      : new Date(node.created_at as string);
+    const daysInCurrentStage = Math.floor((Date.now() - transitionedAt.getTime()) / (1000 * 60 * 60 * 24));
+
+    const VALID_STAGES: readonly LifecycleStage[] = ['hypothesis', 'uncertainty', 'navigation', 'coherence', 'holding', 'archived'];
     const rawStage = node.lifecycle_stage as string;
-    const currentStage: LifecycleStage = VALID_STAGES.includes(rawStage as LifecycleStage) ? (rawStage as LifecycleStage) : 'divergence';
+    const currentStage: LifecycleStage = VALID_STAGES.includes(rawStage as LifecycleStage)
+      ? (rawStage as LifecycleStage)
+      : 'hypothesis';
 
     const stats: HunchStats = {
       currentStage,
@@ -113,6 +156,8 @@ export async function checkHunchPromotion(nodeId: string): Promise<StageDecision
       linkedCommitments,
       activeCommitments,
       testsWithSignals,
+      daysInCurrentStage,
+      linkedLearnings,
     };
 
     return evaluateStagePromotion(stats);
