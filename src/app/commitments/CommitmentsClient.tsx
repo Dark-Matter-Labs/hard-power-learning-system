@@ -51,6 +51,7 @@ export function CommitmentsClient({
   const [addTitle, setAddTitle] = useState('');
   const [addError, setAddError] = useState<string | null>(null);
   const [localOutcomesByGoalSpace, setLocalOutcomesByGoalSpace] = useState<Record<string, Node[]>>({});
+  const [localCommitmentsByOutcome, setLocalCommitmentsByOutcome] = useState<Record<string, Node[]>>({});
 
   // Build hierarchy
   const outcomesByGoalSpace: Record<string, Node[]> = {};
@@ -135,6 +136,28 @@ export function CommitmentsClient({
     setEditingId(null);
   }, []);
 
+  const handleAddCommitment = useCallback(async (outcomeId: string, title: string) => {
+    const nodeRes = await fetch('/api/graph/nodes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, node_type: 'commitment', status: 'promoted' }),
+    });
+    if (!nodeRes.ok) throw new Error('Failed to create commitment');
+    const { data: newCommitment } = await nodeRes.json() as { data: Node };
+
+    const edgeRes = await fetch('/api/graph/edges', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source_id: newCommitment.id, target_id: outcomeId, edge_type: 'assigned_to_outcome', weight: 1 }),
+    });
+    if (!edgeRes.ok) throw new Error('Failed to link commitment to outcome');
+
+    setLocalCommitmentsByOutcome(prev => ({
+      ...prev,
+      [outcomeId]: [...(prev[outcomeId] ?? []), newCommitment],
+    }));
+  }, []);
+
   const handleAddOutcome = useCallback(async (goalSpaceId: string, title: string) => {
     const nodeRes = await fetch('/api/graph/nodes', {
       method: 'POST',
@@ -193,7 +216,16 @@ export function CommitmentsClient({
               <GoalSpaceSection
                 goalSpace={gs}
                 triggerOutcomes={[...(outcomesByGoalSpace[gs.id] ?? []), ...(localOutcomesByGoalSpace[gs.id] ?? [])]}
-                commitmentsByOutcome={commitmentsByOutcome}
+                commitmentsByOutcome={
+                  Object.fromEntries(
+                    Object.entries(commitmentsByOutcome).map(([k, v]) => [
+                      k,
+                      [...v, ...(localCommitmentsByOutcome[k] ?? [])],
+                    ]).concat(
+                      Object.entries(localCommitmentsByOutcome).filter(([k]) => !(k in commitmentsByOutcome))
+                    )
+                  )
+                }
                 unlinkedCommitments={goalSpaceOnlyCommitments[gs.id] ?? []}
                 allNodes={allNodes}
                 edges={edges}
@@ -206,6 +238,7 @@ export function CommitmentsClient({
                 onSave={handleSave}
                 onCancelEdit={() => setEditingId(null)}
                 onAddOutcome={(title) => handleAddOutcome(gs.id, title)}
+                onAddCommitment={handleAddCommitment}
               />
             </div>
           ))}

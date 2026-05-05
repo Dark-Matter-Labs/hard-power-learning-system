@@ -27,6 +27,7 @@ interface GoalSpaceSectionProps {
   readonly onSave?: (id: string, updates: CommitmentUpdates) => Promise<void>;
   readonly onCancelEdit?: () => void;
   readonly onAddOutcome?: (title: string) => Promise<void>;
+  readonly onAddCommitment?: (outcomeId: string, title: string) => Promise<void>;
 }
 
 export function GoalSpaceSection({
@@ -45,6 +46,7 @@ export function GoalSpaceSection({
   onSave,
   onCancelEdit,
   onAddOutcome,
+  onAddCommitment,
 }: GoalSpaceSectionProps) {
   const [expanded, setExpanded] = useState(true);
   const [convergenceData, setConvergenceData] = useState<ConvergenceData | null>(null);
@@ -52,6 +54,10 @@ export function GoalSpaceSection({
   const [addTitle, setAddTitle] = useState('');
   const [addError, setAddError] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [addCommitmentOutcomeId, setAddCommitmentOutcomeId] = useState<string | null>(null);
+  const [addCommitmentTitle, setAddCommitmentTitle] = useState('');
+  const [addCommitmentError, setAddCommitmentError] = useState<string | null>(null);
+  const [isAddingCommitment, setIsAddingCommitment] = useState(false);
 
   useEffect(() => {
     fetch(`/api/convergence/snapshots?goal_space_id=${goalSpace.id}`)
@@ -75,6 +81,22 @@ export function GoalSpaceSection({
     ...Object.values(commitmentsByOutcome).flat(),
     ...unlinkedCommitments,
   ];
+
+  const handleAddCommitmentSubmit = async () => {
+    const trimmed = addCommitmentTitle.trim();
+    if (!trimmed || !onAddCommitment || !addCommitmentOutcomeId) return;
+    setIsAddingCommitment(true);
+    setAddCommitmentError(null);
+    try {
+      await onAddCommitment(addCommitmentOutcomeId, trimmed);
+      setAddCommitmentTitle('');
+      setAddCommitmentOutcomeId(null);
+    } catch {
+      setAddCommitmentError('Failed to add commitment');
+    } finally {
+      setIsAddingCommitment(false);
+    }
+  };
 
   const handleAddOutcomeSubmit = async () => {
     const trimmed = addTitle.trim();
@@ -166,6 +188,55 @@ export function GoalSpaceSection({
                   </div>
                 ) : (
                   <p className="pl-8 text-[9px] text-gray-500 dark:text-gray-700 italic">no commitments</p>
+                )}
+
+                {/* Inline add commitment */}
+                {onAddCommitment && (
+                  <div className="pl-8 py-0.5">
+                    {addCommitmentOutcomeId === outcome.id ? (
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="text"
+                            value={addCommitmentTitle}
+                            onChange={e => setAddCommitmentTitle(e.target.value)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter') { void handleAddCommitmentSubmit(); }
+                              if (e.key === 'Escape') { setAddCommitmentOutcomeId(null); setAddCommitmentTitle(''); setAddCommitmentError(null); }
+                            }}
+                            placeholder="Commitment title…"
+                            autoFocus
+                            className="flex-1 text-[10px] bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded px-1.5 py-0.5 text-gray-700 dark:text-gray-300 focus:outline-none focus:border-xco-teal"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => { void handleAddCommitmentSubmit(); }}
+                            disabled={!addCommitmentTitle.trim() || isAddingCommitment}
+                            className="text-[10px] text-xco-ocean disabled:opacity-40"
+                          >
+                            {isAddingCommitment ? '…' : 'Add'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setAddCommitmentOutcomeId(null); setAddCommitmentTitle(''); setAddCommitmentError(null); }}
+                            className="text-[10px] text-gray-400 hover:text-gray-600"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        {addCommitmentError && <p className="text-[9px] text-red-400 mt-0.5">{addCommitmentError}</p>}
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => { setAddCommitmentOutcomeId(outcome.id); setAddCommitmentTitle(''); setAddCommitmentError(null); }}
+                        className="text-[9px] text-gray-400 hover:text-xco-ocean flex items-center gap-0.5"
+                      >
+                        <span>+</span>
+                        <span>commitment</span>
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             );
