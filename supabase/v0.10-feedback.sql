@@ -12,14 +12,16 @@ CREATE TABLE IF NOT EXISTS query_sessions (
   query_text TEXT NOT NULL,
   response   TEXT NOT NULL,
   node_refs  UUID[] DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_query_sessions_author ON query_sessions(author_id);
 
 ALTER TABLE query_sessions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users manage own query sessions" ON query_sessions
-  FOR ALL USING (author_id = auth.uid());
+  FOR ALL TO authenticated
+  USING (author_id = auth.uid())
+  WITH CHECK (author_id = auth.uid());
 
 -- 3. Feedback records (one per user-submitted correction)
 CREATE TABLE IF NOT EXISTS feedback (
@@ -29,7 +31,7 @@ CREATE TABLE IF NOT EXISTS feedback (
   source_id     UUID NOT NULL,
   feedback_text TEXT NOT NULL,
   applied_at    TIMESTAMPTZ,
-  created_at    TIMESTAMPTZ DEFAULT NOW()
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_feedback_author ON feedback(author_id);
@@ -37,4 +39,6 @@ CREATE INDEX IF NOT EXISTS idx_feedback_source ON feedback(source_type, source_i
 
 ALTER TABLE feedback ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users manage own feedback" ON feedback
-  FOR ALL USING (author_id = auth.uid());
+  FOR ALL TO authenticated
+  USING (author_id = auth.uid())
+  WITH CHECK (author_id = auth.uid());
