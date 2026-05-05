@@ -1,0 +1,133 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { callLLM } from '@/lib/llm';
+
+export interface CorrectionNode {
+  readonly id: string;
+  readonly node_type: string;
+  readonly title: string;
+  readonly description: string | null;
+}
+
+export type CorrectionAction =
+  | { readonly action: 'update'; readonly node_id: string; readonly fields: { readonly title?: string; readonly description?: string; readonly domain_tags?: string[] } }
+  | { readonly action: 'archive'; readonly node_id: string }
+  | { readonly action: 'create'; readonly node_type: string; readonly title: string; readonly description: string };
+
+export interface CorrectionResult {
+  readonly reasoning: string;
+  readonly actions: readonly CorrectionAction[];
+}
+
+const CORRECTION_SYSTEM_PROMPT = `You are a knowledge graph correction agent. The user has flagged an error in AI-generated output.
+You will receive: the original generated text, the nodes that contributed to it (with their full content), and the user's feedback describing what is wrong.
+
+Your job is to decide what corrections are needed and apply them as a JSON action list.
+
+Actions available:
+- update: modify title, description, or domain_tags on an existing node
+- archive: set a node's status to 'archived' (use when a node contains fundamentally wrong information)
+- create: add a new node with correct information (use when the user explicitly identifies something missing)
+
+Rules:
+- Only touch nodes that are directly relevant to the feedback
+- Prefer update over archive unless the node is irreparably wrong
+- Only create a node when the user explicitly identifies missing information
+- Return ONLY valid JSON — no explanation, no markdown
+
+Output schema:
+{
+  "reasoning": "one sentence explaining what was wrong",
+  "actions": [
+    { "action": "update", "node_id": "<uuid>", "fields": { "description": "corrected text" } },
+    { "action": "archive", "node_id": "<uuid>" },
+    { "action": "create", "node_type": "learning", "title": "...", "description": "..." }
+  ]
+}`;
+
+export function buildCorrectionPrompt(
+  generatedText: string,
+  nodes: readonly CorrectionNode[],
+  feedbackText: string
+): string {
+  const nodesSection = nodes.map(n =>
+    `ID: ${n.id}\nType: ${n.node_type}\nTitle: ${n.title}\nDescription: ${n.description ?? '(none)'}`
+  ).join('\n\n');
+
+  return `ORIGINAL GENERATED OUTPUT:\n${generatedText}\n\nCONTRIBUTING NODES:\n${nodesSection}\n\nUSER FEEDBACK:\n${feedbackText}`;
+}
+
+export function parseCorrectionActions(rawJson: string): CorrectionResult {
+  try {
+    const parsed = JSON.parse(rawJson) as unknown;
+    if (typeof parsed !== 'object' || parsed === null) return { reasoning: '', actions: [] };
+    const obj = parsed as Record<string, unknown>;
+    const reasoning = typeof obj['reasoning'] === 'string' ? obj['reasoning'] : '';
+    if (!Array.isArray(obj['actions'])) return { reasoning, actions: [] };
+    const actions = (obj['actions'] as unknown[]).filter((a): a is CorrectionAction => {
+      if (typeof a !== 'object' || a === null) return false;
+      const action = (a as Record<string, unknown>)['action'];
+      return action === 'update' || action === 'archive' || action === 'create';
+    });
+    return { reasoning, actions };
+  } catch {
+    return { reasoning: '', actions: [] };
+  }
+}
+
+export async function applyCorrection(
+  feedbackId: string,
+  nodeRefs: readonly string[],
+  generatedText: string,
+  feedbackText: string,
+  supabase: SupabaseClient,
+  authorId: string
+): Promise<void> {
+  const nodes: CorrectionNode[] = [];
+
+  if (nodeRefs.length > 0) {
+    const { data } = await supabase
+      .from('nodes')
+      .select('id, node_type, title, description')
+      .in('id', nodeRefs);
+    if (data) {
+      for (const row of data) {
+        nodes.push({
+          id: row.id as string,
+          node_type: row.node_type as string,
+          title: row.title as string,
+          description: (row.description ?? null) as string | null,
+        });
+      }
+    }
+  }
+
+  const userMessage = buildCorrectionPrompt(generatedText, nodes, feedbackText);
+  const llmResponse = await callLLM('correction', {
+    systemPrompt: CORRECTION_SYSTEM_PROMPT,
+    userMessage,
+    maxTokens: 600,
+  });
+
+  const { actions } = parseCorrectionActions(llmResponse.content);
+
+  for (const action of actions) {
+    if (action.action === 'update') {
+      await supabase.from('nodes').update(action.fields).eq('id', action.node_id);
+    } else if (action.action === 'archive') {
+      await supabase.from('nodes').update({ status: 'archived' }).eq('id', action.node_id);
+    } else if (action.action === 'create') {
+      await supabase.from('nodes').insert({
+        node_type: action.node_type,
+        title: action.title,
+        description: action.description,
+        status: 'raw',
+        author_id: authorId,
+        hunch_type: 'new',
+        confidence_level: 3,
+        confidence_basis: 'intuition',
+      });
+    }
+  }
+
+  await supabase.from('feedback').update({ applied_at: new Date().toISOString() }).eq('id', feedbackId);
+}
