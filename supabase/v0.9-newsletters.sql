@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS newsletters (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   type       TEXT NOT NULL CHECK (type IN ('mission_pathways', 'close_contacts')),
   content    TEXT NOT NULL,
-  author_id  UUID REFERENCES auth.users(id),
+  author_id  UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
