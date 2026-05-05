@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ConvergenceSparkline } from '@/components/graph/convergence/ConvergenceSparkline';
+import { FeedbackWidget } from '@/components/feedback/FeedbackWidget';
 import { REFLECTION_QUESTIONS } from './questions';
 import type { DecisionEntry, ReflectionSessionPayload, GoalSpaceInfo, ReflectionSession } from './types';
 import type { ConvergenceData } from '@/lib/types/convergence';
@@ -26,6 +27,7 @@ export function ReflectClient({ goalSpaces, lastSession, userId }: ReflectClient
   const [newDecisionText, setNewDecisionText] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveResult, setSaveResult] = useState<'idle' | 'success' | 'error'>('idle');
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   useEffect(() => {
     if (goalSpaces.length === 0) return;
@@ -85,7 +87,13 @@ export function ReflectClient({ goalSpaces, lastSession, userId }: ReflectClient
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      setSaveResult(res.ok ? 'success' : 'error');
+      if (res.ok) {
+        const body = await res.json() as { id?: string };
+        setSessionId(body.id ?? null);
+        setSaveResult('success');
+      } else {
+        setSaveResult('error');
+      }
     } catch {
       setSaveResult('error');
     } finally {
@@ -193,6 +201,9 @@ export function ReflectClient({ goalSpaces, lastSession, userId }: ReflectClient
         )}
         {saveResult === 'error' && (
           <p className="mt-2 text-sm text-red-400">Failed to save</p>
+        )}
+        {saveResult === 'success' && sessionId && (
+          <FeedbackWidget sourceType="reflection" sourceId={sessionId} />
         )}
       </section>
     </div>

@@ -20,7 +20,7 @@ export async function POST(request: Request): Promise<Response> {
       return NextResponse.json({ error: 'decisions must be an array' }, { status: 400 });
     }
 
-    const { error: insertError } = await supabase.from('reflection_sessions').insert({
+    const { data: session, error: insertError } = await supabase.from('reflection_sessions').insert({
       machine_reflection: body.machine_reflection ?? {},
       human_responses: body.human_responses,
       decisions: body.decisions,
@@ -29,13 +29,13 @@ export async function POST(request: Request): Promise<Response> {
       node_count_at_reflection: body.node_count_at_reflection ?? 0,
       triggered_by: 'on_demand',
       run_by: user.id,
-    });
+    }).select('id').single();
 
     if (insertError) {
       return NextResponse.json({ error: insertError.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, id: (session as { id: string }).id });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });

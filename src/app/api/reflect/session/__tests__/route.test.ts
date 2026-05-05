@@ -2,7 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from '../route';
 
 // Mock Supabase server client
-const mockInsert = vi.fn().mockResolvedValue({ error: null });
+const mockSingle = vi.fn().mockResolvedValue({ data: { id: 'session-1' }, error: null });
+const mockSelect = vi.fn().mockReturnValue({ single: mockSingle });
+const mockInsert = vi.fn().mockReturnValue({ select: mockSelect });
 const mockGetUser = vi.fn();
 
 vi.mock('@/lib/supabase/server', () => ({
@@ -56,5 +58,19 @@ describe('POST /api/reflect/session', () => {
     const res = await POST(req);
     expect(res.status).toBe(200);
     expect(mockInsert).toHaveBeenCalledOnce();
+  });
+
+  it('returns session id in response body', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
+
+    const req = new Request('http://localhost/api/reflect/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ human_responses: {}, decisions: [] }),
+    });
+
+    const res = await POST(req);
+    const body = await res.json() as { success: boolean; id: string };
+    expect(body.id).toBe('session-1');
   });
 });
