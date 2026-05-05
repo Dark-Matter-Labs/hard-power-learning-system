@@ -106,6 +106,50 @@ describe('POST /api/feedback', () => {
     expect(body.id).toBe('fb-1');
   });
 
+  it('extracts node refs from reflection machine_reflection JSONB', async () => {
+    const mockApplyCorrection = vi.mocked((await import('@/lib/correction/agent')).applyCorrection);
+    mockFrom
+      .mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: {
+            id: 'r1',
+            machine_reflection: {
+              contradictions: [{ description: 'x', node_ids: ['node-a', 'node-b'] }],
+              recommendations: [{ text: 'y', target_node_id: 'node-c' }],
+            },
+          },
+          error: null,
+        }),
+      })
+      .mockReturnValueOnce({
+        insert: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: { id: 'fb-2', created_at: '2026-05-05T00:00:00Z' },
+          error: null,
+        }),
+      });
+    const { POST } = await import('../route');
+    const req = new Request('http://test/api/feedback', {
+      method: 'POST',
+      body: JSON.stringify({ source_type: 'reflection', source_id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', feedback_text: 'wrong' }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(201);
+    // after() fires synchronously in mock, so applyCorrection is called with node refs
+    expect(mockApplyCorrection).toHaveBeenCalledWith(
+      'fb-2',
+      expect.arrayContaining(['node-a', 'node-b', 'node-c']),
+      expect.any(String),
+      'wrong',
+      expect.anything(),
+      'user-1'
+    );
+  });
+
   it('calls after() to schedule background correction', async () => {
     mockFrom
       .mockReturnValueOnce({
