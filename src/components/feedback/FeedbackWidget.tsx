@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+const NETWORK_ERROR_MSG = 'Network error — please try again';
+
 type FeedbackState = 'idle' | 'open' | 'submitting' | 'done' | 'error';
 
 interface FeedbackWidgetProps {
@@ -32,7 +34,7 @@ export function FeedbackWidget({ sourceType, sourceId }: FeedbackWidgetProps) {
       }
       setState('done');
     } catch {
-      setErrorMsg('Network error — please try again');
+      setErrorMsg(NETWORK_ERROR_MSG);
       setState('error');
     }
   }
@@ -60,6 +62,7 @@ export function FeedbackWidget({ sourceType, sourceId }: FeedbackWidgetProps) {
   return (
     <div className="mt-3 space-y-2">
       <textarea
+        aria-label="Describe what's incorrect or missing"
         value={text}
         onChange={e => setText(e.target.value)}
         placeholder="Describe what's incorrect or missing…"
