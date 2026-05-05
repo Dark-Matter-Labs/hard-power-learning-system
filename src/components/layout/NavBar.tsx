@@ -24,10 +24,12 @@ export function NavBar({ reviewCount }: NavBarProps) {
     { href: '/', label: 'Dashboard' },
     { href: '/graph', label: 'Graph' },
     { href: '/portfolios', label: 'Portfolios' },
+    { href: '/newsletter', label: 'Intelligence' },
     { href: '/commitments', label: 'Commitments' },
     { href: '/query', label: 'Query' },
     { href: '/review', label: 'Health' },
     { href: '/reflect', label: 'Reflect' },
+    { href: '/capture', label: 'Capture' },
     { href: '/settings', label: 'Settings' },
   ];
 
