@@ -581,16 +581,17 @@ const setTooltipRef = useRef(setTooltip);
     function applyStaticPositions(posMap: Map<string, { x: number; y: number }>) {
       cardG.attr('transform', d => {
         const p = posMap.get(d.id) ?? { x: 0, y: 0 };
-        // Store for edge rendering
         d.x = p.x; d.y = p.y;
         return `translate(${p.x - CARD_WIDTH / 2}, ${p.y - CARD_HEIGHT / 2})`;
       });
+      // In static views d.source/d.target are string IDs (no forceLink to resolve them),
+      // so look up positions directly from posMap instead of dereferencing the link object.
       link.attr('d', d => {
-        const sx = (d.source as GraphNode).x ?? 0;
-        const sy = (d.source as GraphNode).y ?? 0;
-        const tx = (d.target as GraphNode).x ?? 0;
-        const ty = (d.target as GraphNode).y ?? 0;
-        return edgePath(sx, sy, tx, ty);
+        const srcId = typeof d.source === 'object' ? (d.source as GraphNode).id : d.source as string;
+        const tgtId = typeof d.target === 'object' ? (d.target as GraphNode).id : d.target as string;
+        const sp = posMap.get(srcId) ?? { x: 0, y: 0 };
+        const tp = posMap.get(tgtId) ?? { x: 0, y: 0 };
+        return edgePath(sp.x, sp.y, tp.x, tp.y);
       });
       graphNodesRef.current = graphNodes;
     }
