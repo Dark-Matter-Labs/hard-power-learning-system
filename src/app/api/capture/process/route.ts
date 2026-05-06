@@ -177,8 +177,12 @@ export async function POST(request: Request) {
         extraction = await runExtraction(node.title, node.description ?? '', goalContext, attachmentContent);
       } catch (err) {
         if (err instanceof Error && err.message === 'PDF_UNREADABLE' && attachmentContent?.type === 'pdf') {
-          // PDF could not be parsed by the LLM — fall back to description-only extraction
-          extraction = await runExtraction(node.title, node.description ?? '', goalContext, undefined);
+          // PDF could not be read by the LLM — fall back to description-only extraction
+          try {
+            extraction = await runExtraction(node.title, node.description ?? '', goalContext, undefined);
+          } catch {
+            throw new Error('This PDF could not be read. Add a description and retry, or upload a text-based PDF.');
+          }
         } else {
           throw err;
         }
