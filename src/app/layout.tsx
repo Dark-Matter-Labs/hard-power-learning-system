@@ -38,14 +38,21 @@ export default async function RootLayout({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Get review count for nav badge
+  // Get review count for nav badge — matches what Health page surfaces
   let reviewCount = 0;
   if (user) {
-    const { count } = await supabase
-      .from('nodes')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'llm_reviewed');
-    reviewCount = count ?? 0;
+    const [{ count: flaggedCount }, { count: learningsCount }] = await Promise.all([
+      supabase
+        .from('nodes')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'flagged_for_review'),
+      supabase
+        .from('nodes')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'llm_reviewed')
+        .in('node_type', ['learning', 'signal']),
+    ]);
+    reviewCount = (flaggedCount ?? 0) + (learningsCount ?? 0);
   }
 
   return (

@@ -32,8 +32,24 @@
   --color-xco-dusk:      #F27F3D;
 }
 
+/* CSS-native dark mode: runs before JS, prevents flash of white on dark-mode systems */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1C1B17;
+    --color-bg-elevated: #252420;
+    --color-bg-subtle: #201F1B;
+    --color-text-primary: #F5F4EF;
+    --color-text-secondary: #B8B5AE;
+    --color-text-tertiary: #7A7872;
+    --color-border: rgba(255, 255, 255, 0.10);
+    --color-border-strong: rgba(255, 255, 255, 0.20);
+    --background: #1C1B17;
+    --foreground: #F5F4EF;
+  }
+}
+
 .dark {
-  /* Dark mode: paper ↔ ink swap */
+  /* JS class overrides — same values, ensures consistency when class is present */
   --color-bg: #1C1B17;
   --color-bg-elevated: #252420;
   --color-bg-subtle: #201F1B;
