@@ -108,6 +108,29 @@ Rules for goal_relevance and expected_signals (only present when goal context is
 
 Mark uncertain extractions appropriately. All outputs are suggestions for human review.`;
 
+/**
+ * Extracts the first complete JSON object from text, handling strings and escapes.
+ * Needed because LLMs sometimes append trailing notes after the JSON closing brace.
+ */
+function extractJsonObject(text: string): string {
+  const start = text.indexOf('{');
+  if (start === -1) return text;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let i = start; i < text.length; i++) {
+    const c = text[i];
+    if (escaped) { escaped = false; continue; }
+    if (c === '\\' && inString) { escaped = true; continue; }
+    if (c === '"') { inString = !inString; continue; }
+    if (!inString) {
+      if (c === '{') depth++;
+      else if (c === '}') { depth--; if (depth === 0) return text.slice(start, i + 1); }
+    }
+  }
+  return text;
+}
+
 export function buildExtractionPrompt(
   title: string,
   description: string,
@@ -186,8 +209,8 @@ export function buildExtractionPrompt(
 }
 
 export function parseExtractionResponse(content: string): LlmExtraction {
-  // Strip markdown code fences if present
-  const cleaned = content.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim();
+  const stripped = content.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim();
+  const cleaned = extractJsonObject(stripped);
 
   let parsed: unknown;
   try {
@@ -269,7 +292,8 @@ export function buildMeetingExtractionPrompt(
 }
 
 export function parseMeetingExtractionResponse(content: string): MeetingExtraction {
-  const cleaned = content.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim();
+  const stripped = content.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim();
+  const cleaned = extractJsonObject(stripped);
   const parsed = JSON.parse(cleaned);
   const required = ['meeting_title', 'meeting_summary', 'extracted_nodes'];
   for (const field of required) {
@@ -346,7 +370,8 @@ export function buildDocumentExtractionPrompt(
 }
 
 export function parseDocumentExtractionResponse(content: string): DocumentExtraction {
-  const cleaned = content.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim();
+  const stripped = content.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim();
+  const cleaned = extractJsonObject(stripped);
   const parsed = JSON.parse(cleaned);
   const required = ['document_title', 'document_summary', 'extracted_nodes'];
   for (const field of required) {
