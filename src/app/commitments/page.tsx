@@ -5,6 +5,8 @@ import type { Node } from '@/lib/types/nodes';
 import type { Edge } from '@/lib/types/edges';
 import type { TensionAlert } from '@/lib/types/tension';
 
+export const dynamic = 'force-dynamic';
+
 export default async function CommitmentsPage({
   searchParams,
 }: {

@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 import { QueryClient } from './QueryClient';
 import type { Node } from '@/lib/types/nodes';
 
+export const dynamic = 'force-dynamic';
+
 export default async function QueryPage() {
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();

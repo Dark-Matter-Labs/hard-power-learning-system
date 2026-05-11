@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 import { ReflectClient } from './ReflectClient';
 import type { GoalSpaceInfo, ReflectionSession } from './types';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ReflectPage() {
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();

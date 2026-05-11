@@ -15,6 +15,8 @@ import {
 import { getKnowledgeReviewTypes } from '@/lib/config/captureTypes';
 import type { FocusItem, SystemPulseData, HunchStageCounts, RhythmData, ActivityNode } from '@/lib/dashboard/queries';
 
+export const dynamic = 'force-dynamic';
+
 function greeting(name: string | null): string {
   const h = new Date().getHours();
   const first = name?.split(' ')[0] ?? 'there';

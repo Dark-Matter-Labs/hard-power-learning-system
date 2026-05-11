@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { NewsletterTabs } from '@/components/newsletter/NewsletterTabs';
 
+export const dynamic = 'force-dynamic';
+
 export default async function NewsletterPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
