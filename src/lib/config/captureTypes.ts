@@ -42,7 +42,7 @@ export interface CaptureTypeConfig {
 // ─── Deployment-level config ─────────────────────────────────────────────────
 // Change these in a fork to match the tenant's vocabulary and domain.
 
-export const ORG_CONTEXT = 'xCO (Expanding Civilisational Optionality), a formation studio working at the intersection of civilisational risk, institutional design, and transition finance';
+export const ORG_CONTEXT = 'The Hard Power Project, a research initiative by Dark Matter Labs';
 
 export const DOMAIN_TAGS: readonly string[] = [
   'dartmoor', 'madrid', 'copenhagen', 'antarctica',
