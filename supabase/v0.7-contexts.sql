@@ -12,5 +12,8 @@ ALTER TABLE nodes ADD COLUMN IF NOT EXISTS context_id UUID REFERENCES contexts(i
 
 ALTER TABLE contexts ENABLE ROW LEVEL SECURITY;
 
+CREATE POLICY "Authenticated users can read contexts" ON contexts
+  FOR SELECT TO authenticated USING (true);
+
 CREATE POLICY "Authenticated users can manage contexts" ON contexts
-  FOR ALL USING (auth.role() = 'authenticated');
+  FOR ALL TO authenticated USING (true) WITH CHECK (true);

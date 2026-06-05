@@ -86,6 +86,18 @@ CREATE INDEX idx_edges_source ON edges(source_id);
 CREATE INDEX idx_edges_target ON edges(target_id);
 CREATE INDEX idx_activity_created ON activity_log(created_at DESC);
 
+-- Contexts (workspaces created during onboarding)
+CREATE TABLE IF NOT EXISTS contexts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  description TEXT,
+  created_by UUID REFERENCES auth.users(id),
+  settings JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE nodes ADD COLUMN IF NOT EXISTS context_id UUID REFERENCES contexts(id);
+
 -- RLS policies (permissive for authenticated users)
 ALTER TABLE node_types ENABLE ROW LEVEL SECURITY;
 ALTER TABLE edge_types ENABLE ROW LEVEL SECURITY;
@@ -111,6 +123,10 @@ CREATE POLICY "Authenticated users can manage assets" ON assets FOR ALL TO authe
 
 CREATE POLICY "Authenticated users can read activity_log" ON activity_log FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Authenticated users can manage activity_log" ON activity_log FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+ALTER TABLE contexts ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Authenticated users can read contexts" ON contexts FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Authenticated users can manage contexts" ON contexts FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 -- Enable Realtime
 ALTER PUBLICATION supabase_realtime ADD TABLE nodes;
