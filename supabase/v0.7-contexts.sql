@@ -10,6 +10,9 @@ CREATE TABLE IF NOT EXISTS contexts (
 
 ALTER TABLE nodes ADD COLUMN IF NOT EXISTS context_id UUID REFERENCES contexts(id);
 
+GRANT ALL ON TABLE contexts TO authenticated;
+GRANT ALL ON TABLE contexts TO service_role;
+
 ALTER TABLE contexts ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Authenticated users can read contexts" ON contexts

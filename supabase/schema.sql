@@ -124,6 +124,9 @@ CREATE POLICY "Authenticated users can manage assets" ON assets FOR ALL TO authe
 CREATE POLICY "Authenticated users can read activity_log" ON activity_log FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Authenticated users can manage activity_log" ON activity_log FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
+GRANT ALL ON TABLE contexts TO authenticated;
+GRANT ALL ON TABLE contexts TO service_role;
+
 ALTER TABLE contexts ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Authenticated users can read contexts" ON contexts FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Authenticated users can manage contexts" ON contexts FOR ALL TO authenticated USING (true) WITH CHECK (true);
