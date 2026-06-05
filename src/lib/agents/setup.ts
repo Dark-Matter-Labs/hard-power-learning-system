@@ -42,6 +42,11 @@ export interface SeedChatResult {
   readonly extracted: ReadonlyArray<{ readonly title: string; readonly node_type: string }>;
 }
 
+function parseJsonSafely<T>(content: string): T {
+  const cleaned = content.replace(/^```(?:json)?\s*/m, '').replace(/\s*```$/m, '').trim();
+  return JSON.parse(cleaned) as T;
+}
+
 export async function suggestGoal(userInput: string): Promise<GoalSuggestion> {
   const response = await callLLM('setup', {
     systemPrompt: GOAL_SUGGEST_PROMPT,
@@ -51,7 +56,7 @@ export async function suggestGoal(userInput: string): Promise<GoalSuggestion> {
 
   let parsed: unknown;
   try {
-    parsed = JSON.parse(response.content);
+    parsed = parseJsonSafely(response.content);
   } catch {
     throw new Error('Failed to parse goal suggestion');
   }
@@ -80,7 +85,7 @@ export async function processSeedChat(input: SeedChatInput): Promise<SeedChatRes
 
   let parsed: unknown;
   try {
-    parsed = JSON.parse(response.content);
+    parsed = parseJsonSafely(response.content);
   } catch {
     throw new Error('Failed to parse seed chat response');
   }

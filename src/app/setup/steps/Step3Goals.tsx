@@ -38,16 +38,18 @@ export function Step3Goals({ onNext, onBack }: Props) {
   const runHelper = async () => {
     if (!helperInput.trim()) return;
     setHelperLoading(true);
+    setError(null);
     try {
       const res = await fetch('/api/setup/goal-suggest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ input: helperInput }),
       });
-      const { data } = await res.json();
-      setHelperSuggestion(data);
-    } catch {
-      // helper is optional, silently fail
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error ?? `Server error ${res.status}`);
+      setHelperSuggestion(body.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not generate suggestion. Please try again.');
     } finally {
       setHelperLoading(false);
     }
