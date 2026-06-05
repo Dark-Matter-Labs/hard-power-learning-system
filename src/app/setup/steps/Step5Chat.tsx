@@ -47,14 +47,14 @@ export function Step5Chat({ goals, onNext, onBack }: Props) {
           goals: goals.map(g => ({ title: g.title })),
         }),
       });
-      if (!res.ok) throw new Error('Failed to send');
-      const { reply, extracted } = await res.json();
-      setHistory(prev => [...prev, { role: 'assistant', content: reply }]);
-      if (extracted?.length > 0) {
-        setCaptured(prev => [...prev, ...extracted]);
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error ?? `Server error ${res.status}`);
+      setHistory(prev => [...prev, { role: 'assistant', content: body.reply }]);
+      if (body.extracted?.length > 0) {
+        setCaptured(prev => [...prev, ...body.extracted]);
       }
-    } catch {
-      setError('Something went wrong. Please try again.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
       setHistory(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);

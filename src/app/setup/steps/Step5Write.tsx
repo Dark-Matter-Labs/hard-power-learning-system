@@ -24,10 +24,11 @@ export function Step5Write({ goals, onNext, onBack }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: 'write', content: content.trim(), goals }),
       });
-      if (!res.ok) throw new Error('Failed to process');
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error ?? `Server error ${res.status}`);
       setSubmitted(true);
-    } catch {
-      setError('Something went wrong. Please try again.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }

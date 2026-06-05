@@ -40,10 +40,11 @@ export function Step2Team({ onNext, onBack }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ members }),
       });
-      if (!res.ok) throw new Error('Failed to save team');
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error ?? `Server error ${res.status}`);
       onNext();
-    } catch {
-      setError('Something went wrong. Please try again.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }

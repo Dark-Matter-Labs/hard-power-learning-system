@@ -55,10 +55,11 @@ export function Step4Sites({ goals, onNext, onBack, onSkip }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sites, options }),
       });
-      if (!res.ok) throw new Error('Failed to save');
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error ?? `Server error ${res.status}`);
       onNext();
-    } catch {
-      setError('Something went wrong. Please try again.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
