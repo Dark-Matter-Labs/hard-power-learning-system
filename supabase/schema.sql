@@ -98,6 +98,15 @@ CREATE TABLE IF NOT EXISTS contexts (
 
 ALTER TABLE nodes ADD COLUMN IF NOT EXISTS context_id UUID REFERENCES contexts(id);
 
+-- Table-level grants (required for PostgREST / Supabase anon+authenticated roles)
+GRANT ALL ON TABLE node_types   TO authenticated, service_role;
+GRANT ALL ON TABLE edge_types   TO authenticated, service_role;
+GRANT ALL ON TABLE nodes        TO authenticated, service_role;
+GRANT ALL ON TABLE edges        TO authenticated, service_role;
+GRANT ALL ON TABLE assets       TO authenticated, service_role;
+GRANT ALL ON TABLE activity_log TO authenticated, service_role;
+GRANT ALL ON TABLE contexts     TO authenticated, service_role;
+
 -- RLS policies (permissive for authenticated users)
 ALTER TABLE node_types ENABLE ROW LEVEL SECURITY;
 ALTER TABLE edge_types ENABLE ROW LEVEL SECURITY;
@@ -123,6 +132,9 @@ CREATE POLICY "Authenticated users can manage assets" ON assets FOR ALL TO authe
 
 CREATE POLICY "Authenticated users can read activity_log" ON activity_log FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Authenticated users can manage activity_log" ON activity_log FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+GRANT ALL ON TABLE contexts TO authenticated;
+GRANT ALL ON TABLE contexts TO service_role;
 
 ALTER TABLE contexts ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Authenticated users can read contexts" ON contexts FOR SELECT TO authenticated USING (true);

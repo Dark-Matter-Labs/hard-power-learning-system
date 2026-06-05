@@ -38,16 +38,18 @@ export function Step3Goals({ onNext, onBack }: Props) {
   const runHelper = async () => {
     if (!helperInput.trim()) return;
     setHelperLoading(true);
+    setError(null);
     try {
       const res = await fetch('/api/setup/goal-suggest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ input: helperInput }),
       });
-      const { data } = await res.json();
-      setHelperSuggestion(data);
-    } catch {
-      // helper is optional, silently fail
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error ?? `Server error ${res.status}`);
+      setHelperSuggestion(body.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not generate suggestion. Please try again.');
     } finally {
       setHelperLoading(false);
     }
@@ -72,11 +74,11 @@ export function Step3Goals({ onNext, onBack }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ goals: validGoals }),
       });
-      if (!res.ok) throw new Error('Failed to save goals');
-      const { data } = await res.json();
-      onNext(data.map((n: { id: string; title: string }) => ({ id: n.id, title: n.title })));
-    } catch {
-      setError('Something went wrong. Please try again.');
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error ?? `Server error ${res.status}`);
+      onNext(body.data.map((n: { id: string; title: string }) => ({ id: n.id, title: n.title })));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
