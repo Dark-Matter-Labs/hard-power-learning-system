@@ -22,13 +22,13 @@ export function Step1Workspace({ onNext }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name.trim(), description: description.trim() || undefined }),
       });
-      if (!res.ok) throw new Error('Failed to save workspace');
-      const { data } = await res.json();
-      localStorage.setItem('setup_context_id', data.id);
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error ?? `Server error ${res.status}`);
+      localStorage.setItem('setup_context_id', body.data.id);
       localStorage.setItem('setup_workspace_name', name.trim());
       onNext();
-    } catch {
-      setError('Something went wrong. Please try again.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
