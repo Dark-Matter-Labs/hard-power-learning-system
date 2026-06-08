@@ -22,8 +22,8 @@ function LoginForm() {
     <div className="font-ui min-h-screen flex items-center justify-center bg-xco-navy">
       <div className="max-w-sm w-full space-y-8 p-8">
         <div className="text-center">
-          <h1 className="font-display text-2xl font-semibold text-xco-paper tracking-widest">Hard Power</h1>
-          <p className="mt-2 text-sm text-xco-ink-muted">The Hard Power Project</p>
+          <h1 className="font-display text-2xl font-semibold text-xco-paper tracking-widest">Heart Power</h1>
+          <p className="mt-2 text-sm text-xco-ink-muted">The Heart Power Project</p>
         </div>
 
         {error === 'unauthorized' && (
