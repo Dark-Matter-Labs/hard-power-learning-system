@@ -27,8 +27,8 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Hard Power',
-  description: 'The Hard Power Project — knowledge system by Dark Matter Labs',
+  title: 'Heart Power',
+  description: 'The Heart Power Project — knowledge system by Dark Matter Labs',
 };
 
 export default async function RootLayout({

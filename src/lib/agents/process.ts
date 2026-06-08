@@ -35,14 +35,14 @@ export interface CommitmentAssessment {
   readonly reasoning: string;
 }
 
-const STEP1_SYSTEM_PROMPT = `You are an analysis system for the The Hard Power Project. Your task is to identify which existing nodes in the knowledge graph a new learning or signal might affect.
+const STEP1_SYSTEM_PROMPT = `You are an analysis system for the The Heart Power Project. Your task is to identify which existing nodes in the knowledge graph a new learning or signal might affect.
 
 Return ONLY valid JSON array:
 [{ "nodeId": "uuid", "relationship": "SUPPORTS" | "CHALLENGES", "reasoning": "1-2 sentence explanation" }]
 
 Only include nodes where the relationship is clear and meaningful. If a node is UNRELATED, exclude it. Aim for 1-5 relevant nodes maximum.`;
 
-const STEP2_SYSTEM_PROMPT = `You are a strategic thinking assistant for The Hard Power Project, a research initiative by Dark Matter Labs.
+const STEP2_SYSTEM_PROMPT = `You are a strategic thinking assistant for The Heart Power Project, a research initiative by Dark Matter Labs.
 
 Given a learning or signal, identify if it suggests a new strategic hunch worth exploring.
 
@@ -51,7 +51,7 @@ Return ONLY valid JSON:
 
 If no hunch is clearly warranted, return { "suggested": false, "hunch": null, "reasoning": "why not" }`;
 
-const STEP3_SYSTEM_PROMPT = `You are analyzing how a new learning or signal affects active resource commitments at The Hard Power Project.
+const STEP3_SYSTEM_PROMPT = `You are analyzing how a new learning or signal affects active resource commitments at The Heart Power Project.
 
 Return ONLY valid JSON array:
 [{ "commitmentId": "uuid", "assessment": "ON_TRACK" | "NEEDS_ATTENTION" | "REFRAME" | "STOP", "reasoning": "1-2 sentence explanation" }]

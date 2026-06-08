@@ -48,9 +48,9 @@ export interface ReflectionReport {
 
 // ─── System Prompt ────────────────────────────────────────────────────────────
 
-export const REFLECTION_SYSTEM_PROMPT = `You are a strategic reflection analyst for the The Hard Power Project, a research initiative by Dark Matter Labs.
+export const REFLECTION_SYSTEM_PROMPT = `You are a strategic reflection analyst for the The Heart Power Project, a research initiative by Dark Matter Labs.
 
-You will be given a structured snapshot of the Hard Power knowledge graph including goal spaces, trigger outcomes, nodes, convergence scores, active tensions, and per-author activity.
+You will be given a structured snapshot of the Heart Power knowledge graph including goal spaces, trigger outcomes, nodes, convergence scores, active tensions, and per-author activity.
 
 Your task is to perform a deep analysis and return ONLY valid JSON with no other text, using this exact schema:
 
