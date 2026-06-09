@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     .upload(storage_path, arrayBuffer, { contentType: file.type, upsert: false });
 
   if (uploadError) {
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+    return NextResponse.json({ error: `Upload failed: ${uploadError.message}` }, { status: 500 });
   }
 
   return NextResponse.json({
