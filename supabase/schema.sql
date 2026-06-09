@@ -140,6 +140,32 @@ ALTER TABLE contexts ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Authenticated users can read contexts" ON contexts FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Authenticated users can manage contexts" ON contexts FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
+-- Storage bucket for file attachments (PDF, DOCX, TXT)
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'attachments',
+  'attachments',
+  false,
+  10485760,  -- 10MB
+  ARRAY[
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'text/plain'
+  ]
+) ON CONFLICT (id) DO NOTHING;
+
+CREATE POLICY "Authenticated users can upload attachments"
+  ON storage.objects FOR INSERT TO authenticated
+  WITH CHECK (bucket_id = 'attachments' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+CREATE POLICY "Authenticated users can read own attachments"
+  ON storage.objects FOR SELECT TO authenticated
+  USING (bucket_id = 'attachments' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+CREATE POLICY "Authenticated users can delete own attachments"
+  ON storage.objects FOR DELETE TO authenticated
+  USING (bucket_id = 'attachments' AND (storage.foldername(name))[1] = auth.uid()::text);
+
 -- Enable Realtime
 ALTER PUBLICATION supabase_realtime ADD TABLE nodes;
 ALTER PUBLICATION supabase_realtime ADD TABLE edges;
