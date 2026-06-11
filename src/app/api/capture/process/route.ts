@@ -91,10 +91,15 @@ export async function POST(request: Request) {
       if (fileData) {
         const arrayBuffer = await fileData.arrayBuffer();
 
-        if (attachment.mime_type === 'text/plain') {
+        if (attachment.mime_type === 'text/plain' || attachment.mime_type === 'text/markdown') {
           attachmentContent = { type: 'text', textContent: new TextDecoder().decode(arrayBuffer) };
         } else if (attachment.mime_type === 'application/pdf') {
-          attachmentContent = { type: 'pdf', base64: Buffer.from(arrayBuffer).toString('base64') };
+          const buffer = Buffer.from(arrayBuffer);
+          const { pdfToMarkdown } = await import('@/lib/files/pdfToMarkdown');
+          const markdown = await pdfToMarkdown(buffer);
+          attachmentContent = markdown
+            ? { type: 'text', textContent: markdown }
+            : { type: 'pdf', base64: buffer.toString('base64') };
         } else if (attachment.mime_type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
           const mammoth = await import('mammoth');
           const result = await mammoth.extractRawText({ buffer: Buffer.from(arrayBuffer) });

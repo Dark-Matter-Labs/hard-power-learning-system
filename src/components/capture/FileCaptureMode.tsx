@@ -46,12 +46,12 @@ export function FileCaptureMode({ onFileSelect, selectedFile, isUploading, uploa
           <input
             type="file"
             className="sr-only"
-            accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
+            accept=".pdf,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown"
             onChange={e => handleFiles(e.target.files)}
             data-testid="file-input"
           />
           <p className="text-sm text-gray-500 dark:text-gray-400">Drop a file here, or click to browse</p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PDF · DOCX · TXT · Max 10MB</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PDF · DOCX · TXT · MD · Max 10MB</p>
         </label>
       )}
       {uploadError && <p className="mt-2 text-sm text-red-400">{uploadError}</p>}

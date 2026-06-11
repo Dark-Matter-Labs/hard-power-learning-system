@@ -140,7 +140,7 @@ ALTER TABLE contexts ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Authenticated users can read contexts" ON contexts FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Authenticated users can manage contexts" ON contexts FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
--- Storage bucket for file attachments (PDF, DOCX, TXT)
+-- Storage bucket for file attachments (PDF, DOCX, TXT, MD)
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (
   'attachments',
@@ -150,9 +150,10 @@ VALUES (
   ARRAY[
     'application/pdf',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'text/plain'
+    'text/plain',
+    'text/markdown'
   ]
-) ON CONFLICT (id) DO NOTHING;
+) ON CONFLICT (id) DO UPDATE SET allowed_mime_types = EXCLUDED.allowed_mime_types;
 
 CREATE POLICY "Authenticated users can upload attachments"
   ON storage.objects FOR INSERT TO authenticated
