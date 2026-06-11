@@ -6,6 +6,7 @@ const ALLOWED_TYPES = new Set([
   'application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'text/plain',
+  'text/markdown',
 ]);
 
 const MAX_SIZE = 10 * 1024 * 1024;
@@ -14,6 +15,7 @@ const EXT_MAP: Record<string, string> = {
   'application/pdf': 'pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
   'text/plain': 'txt',
+  'text/markdown': 'md',
 };
 
 export async function POST(request: Request) {
@@ -36,7 +38,7 @@ export async function POST(request: Request) {
   }
 
   if (!ALLOWED_TYPES.has(file.type)) {
-    return NextResponse.json({ error: 'Only PDF, DOCX, and TXT files are supported' }, { status: 400 });
+    return NextResponse.json({ error: 'Only PDF, DOCX, TXT, and MD files are supported' }, { status: 400 });
   }
 
   const expectedExt = EXT_MAP[file.type];
